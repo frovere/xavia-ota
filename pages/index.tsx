@@ -25,7 +25,7 @@ export default function Home() {
         setError(data.error);
       } else {
         localStorage.setItem('isAuthenticated', 'true');
-        router.push('/dashboard');
+        void router.push('/dashboard');
       }
     } catch (err) {
       setError('Failed to login');
@@ -35,12 +35,18 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <form onSubmit={handleLogin} className="w-full max-w-sm">
+      <form
+        onSubmit={(e) => {
+          void handleLogin(e);
+        }}
+        className="w-full max-w-sm">
         <div className="mb-4">
           <Input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
             placeholder="Enter admin password"
           />
           {error && <p className="mt-1 text-sm text-destructive">{error}</p>}

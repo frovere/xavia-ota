@@ -9,8 +9,8 @@ import {
 import { StorageInterface } from './storage-interface';
 
 export class S3Storage implements StorageInterface {
-  private client: S3Client;
-  private bucketName: string;
+  private readonly client: S3Client;
+  private readonly bucketName: string;
 
   constructor() {
     if (!process.env.S3_ACCESS_KEY_ID || !process.env.S3_SECRET_ACCESS_KEY) {
@@ -107,7 +107,7 @@ export class S3Storage implements StorageInterface {
     const response = await this.client.send(listCommand);
     return (
       response.CommonPrefixes?.map((prefix) =>
-        prefix.Prefix!.replace(directory, '').replace(/\/$/, '')
+        prefix.Prefix!.replace(directory, '').replace(/\/$/, ''),
       ) ?? []
     );
   }
