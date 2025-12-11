@@ -183,3 +183,15 @@ The project uses Husky for pre-commit hooks:
 
 - `commit-msg` - Validates commit message format
 - `pre-commit` - Runs linting and formatting checks
+
+## React Compiler
+
+This project uses [React Compiler](https://react.dev/learn/react-compiler) for automatic memoization optimization. The compiler is enabled in `next.config.js` via `experimental: { reactCompiler: true }`.
+
+### ESLint Integration
+
+The `eslint-plugin-react-hooks` plugin (v7+) includes compiler-powered lint rules that help identify violations of the Rules of React. These are enabled via the `plugin:react-hooks/recommended` preset in `.eslintrc`.
+
+### Upgrading the Compiler
+
+The `babel-plugin-react-compiler` is pinned to an exact version to avoid unexpected behavior from memoization changes. When upgrading, test thoroughly and update the version manually.

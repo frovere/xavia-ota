@@ -3,7 +3,8 @@
   "extends": [
     "universe/node",
     "universe/shared/typescript-analysis",
-    "plugin:@next/next/recommended"
+    "plugin:@next/next/recommended",
+    "plugin:react-hooks/recommended"
   ],
   "rules": {
     "handle-callback-err": "off",
