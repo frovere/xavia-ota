@@ -1,11 +1,11 @@
 import { createMocks } from 'node-mocks-http';
 
-import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { StorageFactory } from '@/api-utils/storage/storage-factory';
 import rollbackHandler from '@/pages/api/rollback';
 
-jest.mock('../apiUtils/database/DatabaseFactory');
-jest.mock('../apiUtils/storage/StorageFactory');
+jest.mock('../api-utils/database/database-factory');
+jest.mock('../api-utils/storage/storage-factory');
 
 describe('Rollback API', () => {
   beforeEach(() => {

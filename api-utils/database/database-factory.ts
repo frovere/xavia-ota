@@ -1,6 +1,6 @@
-import { DatabaseInterface } from './DatabaseInterface';
-import { PostgresDatabase } from './LocalDatabase';
-import { SupabaseDatabase } from './SupabaseDatabase';
+import { DatabaseInterface } from './database-interface';
+import { PostgresDatabase } from './local-database';
+import { SupabaseDatabase } from './supabase-database';
 
 export enum Tables {
   RELEASES = 'releases',

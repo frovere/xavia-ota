@@ -25,8 +25,8 @@ import {
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import Layout from '@/components/Layout';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import Layout from '@/components/layout';
+import ProtectedRoute from '@/components/protected-route';
 import { showToast } from '@/components/toast';
 
 interface Release {
@@ -162,7 +162,8 @@ export default function ReleasesPage() {
                                   <Button
                                     variant="secondary"
                                     size="sm"
-                                    onClick={() => setSelectedRelease(release)}>
+                                    onClick={() => setSelectedRelease(release)}
+                                  >
                                     Rollback to this release
                                   </Button>
                                 </AlertDialogTrigger>
@@ -179,7 +180,8 @@ export default function ReleasesPage() {
                                     </Badge>
                                     <Badge
                                       variant="secondary"
-                                      className="w-full justify-center p-4">
+                                      className="w-full justify-center p-4"
+                                    >
                                       This will promote this release to be the active release with a
                                       new timestamp.
                                     </Badge>
@@ -188,7 +190,8 @@ export default function ReleasesPage() {
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={handleRollback}
-                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
                                       Rollback
                                     </AlertDialogAction>
                                   </AlertDialogFooter>

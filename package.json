@@ -7,7 +7,7 @@
     "next:dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint apiUtils pages",
+    "lint": "eslint api-utils pages",
     "test": "jest",
     "prepare": "husky",
     "release": "bash ./scripts/release.sh",

@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import Layout from '@/components/Layout';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import Layout from '@/components/layout';
+import LoadingSpinner from '@/components/loading-spinner';
+import ProtectedRoute from '@/components/protected-route';
 
-import { TrackingMetrics } from '@/apiUtils/database/DatabaseInterface';
+import { TrackingMetrics } from '@/api-utils/database/database-interface';
 import { AllTrackingResponse } from './api/tracking/all';
 
 export default function Dashboard() {

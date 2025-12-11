@@ -3,16 +3,16 @@ import { createMocks } from 'node-mocks-http';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
-import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
-import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
-import { HashHelper } from '@/apiUtils/helpers/HashHelper';
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { StorageFactory } from '@/api-utils/storage/storage-factory';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
+import { HashHelper } from '@/api-utils/helpers/hash-helper';
 import uploadHandler from '@/pages/api/upload';
 
-jest.mock('../apiUtils/database/DatabaseFactory');
-jest.mock('../apiUtils/storage/StorageFactory');
-jest.mock('../apiUtils/helpers/ZipHelper');
-jest.mock('../apiUtils/helpers/HashHelper');
+jest.mock('../api-utils/database/database-factory');
+jest.mock('../api-utils/storage/storage-factory');
+jest.mock('../api-utils/helpers/zip-helper');
+jest.mock('../api-utils/helpers/hash-helper');
 jest.mock('formidable');
 jest.mock('adm-zip');
 

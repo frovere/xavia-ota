@@ -15,6 +15,7 @@ A self-hosted Over-The-Air (OTA) updates server for Expo/RN applications that gi
   - [Overview](#overview)
   - [Key Features](#key-features)
   - [Deployment](#deployment)
+    - [Load test your deployment setup](#load-test-your-deployment-setup)
   - [Local Development](#local-development)
   - [Code Signing](#code-signing)
   - [React Native app configuration](#react-native-app-configuration)
@@ -71,7 +72,7 @@ The easiest way to deploy Xavia OTA is using our public Docker image. The image 
     ` docker run -d -p 3000:3000 xaviaio/xavia-ota -e HOST=http://localhost:3000 ...`
 
 ### Load test your deployment setup
-Check [this](./docs/laod_testing.md) on how to run load testing for your OTA server in your deployment infrastructure.
+Check [this](./docs/load-testing.md) on how to run load testing for your OTA server in your deployment infrastructure.
 
 ## Local Development
 
@@ -110,7 +111,7 @@ Check [this](./docs/laod_testing.md) on how to run load testing for your OTA ser
 The server and admin dashboard will be available at `http://localhost:3000`.
 
 
-Refer to [Storage & Database Configuration](./docs/supportedStorageAlternatives.md) for more configuration options.
+Refer to [Storage & Database Configuration](./docs/supported-storage-alternatives.md) for more configuration options.
 
 
 ## Code Signing 
@@ -161,7 +162,7 @@ What happens behind the scenes is that we copy the inactive update with a new ti
 
 ## Admin Dashboard
 
-For more information about the admin dashboard, please refer to the [Admin Dashboard](./docs/adminPortal.md) documentation.
+For more information about the admin dashboard, please refer to the [Admin Dashboard](./docs/admin-portal.md) documentation.
 
 ## Technical Stack
 
@@ -169,14 +170,14 @@ For more information about the admin dashboard, please refer to the [Admin Dashb
 - **Framework**: Next.js 15+
 - **Language**: TypeScript
 - **Database**: PostgreSQL 14
-- **UI Library**: Chakra UI (v2) and Tailwind CSS for styling
+- **UI Library**: shadcn/ui and Tailwind CSS for styling
 - **Container**: Docker & Docker Compose
 
 ### Storage Options
 - Local filesystem storage for development
 - Supabase storage for production deployments
   
-Read more about supported blob storage and database options [here](./docs/supportedStorageAlternatives.md).
+Read more about supported blob storage and database options [here](./docs/supported-storage-alternatives.md).
 
 
 

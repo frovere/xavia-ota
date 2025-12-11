@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { StorageInterface } from './StorageInterface';
+import { StorageInterface } from './storage-interface';
 
 export class LocalStorage implements StorageInterface {
   private baseDir: string;

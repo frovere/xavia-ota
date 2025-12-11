@@ -1,6 +1,6 @@
 import { Storage } from '@google-cloud/storage';
 
-import { StorageInterface } from './StorageInterface';
+import { StorageInterface } from './storage-interface';
 
 export class GCSStorage implements StorageInterface {
   private storage;

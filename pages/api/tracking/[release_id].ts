@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
-import { getLogger } from '@/apiUtils/logger';
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { getLogger } from '@/api-utils/logger';
 
 const logger = getLogger('trackingByReleaseHandler');
 

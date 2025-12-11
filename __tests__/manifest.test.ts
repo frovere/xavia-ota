@@ -2,19 +2,19 @@ import AdmZip from 'adm-zip';
 import { createMocks } from 'node-mocks-http';
 import FormData from 'form-data';
 
-import { ConfigHelper } from '@/apiUtils/helpers/ConfigHelper';
-import { UpdateHelper, NoUpdateAvailableError } from '@/apiUtils/helpers/UpdateHelper';
-import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
-import { HashHelper } from '@/apiUtils/helpers/HashHelper';
+import { ConfigHelper } from '@/api-utils/helpers/config-helper';
+import { UpdateHelper, NoUpdateAvailableError } from '@/api-utils/helpers/update-helper';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
+import { HashHelper } from '@/api-utils/helpers/hash-helper';
 import manifestEndpoint from '@/pages/api/manifest';
-import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
-import { DatabaseInterface, Release } from '@/apiUtils/database/DatabaseInterface';
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { DatabaseInterface, Release } from '@/api-utils/database/database-interface';
 
-jest.mock('../apiUtils/helpers/UpdateHelper');
-jest.mock('../apiUtils/helpers/ZipHelper');
-jest.mock('../apiUtils/helpers/ConfigHelper');
-jest.mock('../apiUtils/helpers/HashHelper');
-jest.mock('../apiUtils/database/DatabaseFactory');
+jest.mock('../api-utils/helpers/update-helper');
+jest.mock('../api-utils/helpers/zip-helper');
+jest.mock('../api-utils/helpers/config-helper');
+jest.mock('../api-utils/helpers/hash-helper');
+jest.mock('../api-utils/database/database-factory');
 jest.mock('form-data');
 
 describe('Manifest API', () => {

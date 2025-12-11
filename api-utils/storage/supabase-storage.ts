@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-import { StorageInterface } from './StorageInterface';
+import { StorageInterface } from './storage-interface';
 
 export class SupabaseStorage implements StorageInterface {
   private supabase;

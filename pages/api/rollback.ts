@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { StorageFactory } from '@/api-utils/storage/storage-factory';
 
 export default async function rollbackHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

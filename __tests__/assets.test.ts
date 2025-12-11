@@ -1,11 +1,11 @@
 import { createMocks } from 'node-mocks-http';
 
-import { UpdateHelper } from '@/apiUtils/helpers/UpdateHelper';
-import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
+import { UpdateHelper } from '@/api-utils/helpers/update-helper';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import assetsEndpoint from '@/pages/api/assets';
 
-jest.mock('../apiUtils/helpers/UpdateHelper');
-jest.mock('../apiUtils/helpers/ZipHelper');
+jest.mock('../api-utils/helpers/update-helper');
+jest.mock('../api-utils/helpers/zip-helper');
 
 describe('Assets API', () => {
   beforeEach(() => {

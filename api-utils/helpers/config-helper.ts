@@ -1,4 +1,4 @@
-import { ZipHelper } from './ZipHelper';
+import { ZipHelper } from './zip-helper';
 
 export class ConfigHelper {
   static async getExpoConfigAsync({

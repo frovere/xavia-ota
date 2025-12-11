@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-import { DatabaseInterface, Release, Tracking, TrackingMetrics } from './DatabaseInterface';
-import { Tables } from './DatabaseFactory';
+import { DatabaseInterface, Release, Tracking, TrackingMetrics } from './database-interface';
+import { Tables } from './database-factory';
 
 export class SupabaseDatabase implements DatabaseInterface {
   private supabase;

@@ -2,8 +2,8 @@ import mime from 'mime';
 import { NextApiRequest, NextApiResponse } from 'next';
 import nullthrows from 'nullthrows';
 
-import { UpdateHelper } from '@/apiUtils/helpers/UpdateHelper';
-import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
+import { UpdateHelper } from '@/api-utils/helpers/update-helper';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 
 export default async function assetsEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const { asset: assetPath, runtimeVersion, platform } = req.query;

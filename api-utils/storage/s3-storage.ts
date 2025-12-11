@@ -6,7 +6,7 @@ import {
   PutObjectCommand,
   CopyObjectCommand,
 } from '@aws-sdk/client-s3';
-import { StorageInterface } from './StorageInterface';
+import { StorageInterface } from './storage-interface';
 
 export class S3Storage implements StorageInterface {
   private client: S3Client;

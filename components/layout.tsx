@@ -4,7 +4,7 @@ import { LucideLayoutDashboard, LucideLogOut, LucideTags } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -42,7 +42,8 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
                 key={item.path}
                 variant={router.pathname === item.path ? 'default' : 'ghost'}
                 onClick={() => router.push(item.path)}
-                className="justify-between">
+                className="justify-between"
+              >
                 <span className="flex-1 text-left">{item.name}</span>
                 {item.icon}
               </Button>
