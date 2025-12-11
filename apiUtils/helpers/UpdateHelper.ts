@@ -2,7 +2,7 @@ import mime from 'mime';
 
 import { HashHelper } from './HashHelper';
 import { ZipHelper } from './ZipHelper';
-import { StorageFactory } from '../storage/StorageFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
 
 export class NoUpdateAvailableError extends Error {}
 export type GetAssetMetadataArg =

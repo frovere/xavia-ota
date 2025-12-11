@@ -1,6 +1,6 @@
 import { createMocks } from 'node-mocks-http';
 
-import loginEndpoint from '../pages/api/login';
+import loginEndpoint from '@/pages/api/login';
 
 describe('Login API', () => {
   const originalEnv = process.env;

@@ -1,6 +1,6 @@
 import AdmZip from 'adm-zip';
 
-import { StorageFactory } from '../storage/StorageFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
 
 interface CachedZip {
   zip: AdmZip;

@@ -3,11 +3,11 @@ import { createMocks } from 'node-mocks-http';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
-import { DatabaseFactory } from '../apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '../apiUtils/storage/StorageFactory';
-import { ZipHelper } from '../apiUtils/helpers/ZipHelper';
-import { HashHelper } from '../apiUtils/helpers/HashHelper';
-import uploadHandler from '../pages/api/upload';
+import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
+import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
+import { HashHelper } from '@/apiUtils/helpers/HashHelper';
+import uploadHandler from '@/pages/api/upload';
 
 jest.mock('../apiUtils/database/DatabaseFactory');
 jest.mock('../apiUtils/storage/StorageFactory');

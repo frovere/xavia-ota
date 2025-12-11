@@ -2,13 +2,12 @@ import formidable from 'formidable';
 import fs from 'fs';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-import { DatabaseFactory } from '../../apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '../../apiUtils/storage/StorageFactory';
-
 import AdmZip from 'adm-zip';
-import { ZipHelper } from '../../apiUtils/helpers/ZipHelper';
-import { HashHelper } from '../../apiUtils/helpers/HashHelper';
+
+import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
+import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
+import { HashHelper } from '@/apiUtils/helpers/HashHelper';
 
 export const config = {
   api: {

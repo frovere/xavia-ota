@@ -3,13 +3,13 @@ import FormData from 'form-data';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { serializeDictionary } from 'structured-headers';
 
-import { ConfigHelper } from '../../apiUtils/helpers/ConfigHelper';
-import { DictionaryHelper } from '../../apiUtils/helpers/DictionaryHelper';
-import { HashHelper } from '../../apiUtils/helpers/HashHelper';
-import { UpdateHelper, NoUpdateAvailableError } from '../../apiUtils/helpers/UpdateHelper';
-import { ZipHelper } from '../../apiUtils/helpers/ZipHelper';
-import { getLogger } from '../../apiUtils/logger';
-import { DatabaseFactory } from '../../apiUtils/database/DatabaseFactory';
+import { ConfigHelper } from '@/apiUtils/helpers/ConfigHelper';
+import { DictionaryHelper } from '@/apiUtils/helpers/DictionaryHelper';
+import { HashHelper } from '@/apiUtils/helpers/HashHelper';
+import { UpdateHelper, NoUpdateAvailableError } from '@/apiUtils/helpers/UpdateHelper';
+import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
+import { getLogger } from '@/apiUtils/logger';
+import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
 import moment from 'moment';
 
 const logger = getLogger('manifest');

@@ -1,8 +1,8 @@
 import { createMocks } from 'node-mocks-http';
 
-import { DatabaseFactory } from '../apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '../apiUtils/storage/StorageFactory';
-import releasesHandler from '../pages/api/releases';
+import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
+import releasesHandler from '@/pages/api/releases';
 
 jest.mock('../apiUtils/database/DatabaseFactory');
 jest.mock('../apiUtils/storage/StorageFactory');

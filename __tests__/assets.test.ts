@@ -1,8 +1,8 @@
 import { createMocks } from 'node-mocks-http';
 
-import { UpdateHelper } from '../apiUtils/helpers/UpdateHelper';
-import { ZipHelper } from '../apiUtils/helpers/ZipHelper';
-import assetsEndpoint from '../pages/api/assets';
+import { UpdateHelper } from '@/apiUtils/helpers/UpdateHelper';
+import { ZipHelper } from '@/apiUtils/helpers/ZipHelper';
+import assetsEndpoint from '@/pages/api/assets';
 
 jest.mock('../apiUtils/helpers/UpdateHelper');
 jest.mock('../apiUtils/helpers/ZipHelper');

@@ -1,8 +1,8 @@
 import { createMocks } from 'node-mocks-http';
 
-import { DatabaseFactory } from '../apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '../apiUtils/storage/StorageFactory';
-import rollbackHandler from '../pages/api/rollback';
+import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
+import rollbackHandler from '@/pages/api/rollback';
 
 jest.mock('../apiUtils/database/DatabaseFactory');
 jest.mock('../apiUtils/storage/StorageFactory');

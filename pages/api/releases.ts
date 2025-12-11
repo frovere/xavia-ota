@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { DatabaseFactory } from '../../apiUtils/database/DatabaseFactory';
-import { StorageFactory } from '../../apiUtils/storage/StorageFactory';
+import { DatabaseFactory } from '@/apiUtils/database/DatabaseFactory';
+import { StorageFactory } from '@/apiUtils/storage/StorageFactory';
 
 export default async function releasesHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
