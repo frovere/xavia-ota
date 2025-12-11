@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button, FormControl, FormErrorMessage, Input } from '@chakra-ui/react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function Home() {
   const [password, setPassword] = useState('');
@@ -32,22 +34,21 @@ export default function Home() {
   };
 
   return (
-    <Box display="flex" minHeight="100vh" alignItems="center" justifyContent="center">
-      <form onSubmit={handleLogin}>
-        <FormControl isInvalid={!!error} mb={4}>
+    <div className="flex min-h-screen items-center justify-center">
+      <form onSubmit={handleLogin} className="w-full max-w-sm">
+        <div className="mb-4">
           <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter admin password"
-            size="md"
           />
-          {error && <FormErrorMessage>{error}</FormErrorMessage>}
-        </FormControl>
-        <Button type="submit" colorScheme="blue" width="full">
+          {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
+        </div>
+        <Button type="submit" className="w-full">
           Login
         </Button>
       </form>
-    </Box>
+    </div>
   );
 }

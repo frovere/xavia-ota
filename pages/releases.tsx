@@ -1,33 +1,33 @@
-import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Text,
-  Heading,
-  Button,
-  Tag,
-  HStack,
-  IconButton,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  Flex,
-  Tooltip,
-} from '@chakra-ui/react';
 import moment from 'moment';
-import { useEffect, useRef, useState } from 'react';
-import { SlRefresh } from 'react-icons/sl';
+import { useEffect, useState } from 'react';
+import { LucideRefreshCw } from 'lucide-react';
 
-import Layout from '../components/Layout';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { showToast } from '../components/toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import Layout from '@/components/Layout';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { showToast } from '@/components/toast';
 
 interface Release {
   path: string;
@@ -42,9 +42,7 @@ export default function ReleasesPage() {
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
-  const cancelRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     fetchReleases();
@@ -65,157 +63,147 @@ export default function ReleasesPage() {
     }
   };
 
+  const handleRollback = async () => {
+    if (!selectedRelease) return;
+
+    try {
+      const response = await fetch('/api/rollback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: selectedRelease.path,
+          runtimeVersion: selectedRelease.runtimeVersion,
+          commitHash: selectedRelease.commitHash,
+          commitMessage: selectedRelease.commitMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Rollback failed');
+      }
+
+      showToast('Rollback successful', 'success');
+      fetchReleases();
+    } catch {
+      showToast('Rollback failed', 'error');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <Layout>
-        <Box mx={4}>
-          <Flex className="flex-col">
-            <HStack>
-              <Heading size="lg">Releases</Heading>
-              <IconButton
-                aria-label="Refresh"
-                onClick={fetchReleases}
-                variant="solid"
-                // colorScheme="blue"
-                size="md"
-                icon={<SlRefresh />}
-              />
-            </HStack>
+        <div className="mx-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">Releases</h1>
+              <Button variant="outline" size="icon" onClick={fetchReleases}>
+                <LucideRefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
 
-            {loading && <Text>Loading...</Text>}
-            {error && <Text color="red.500">{error}</Text>}
+            {loading && <p>Loading...</p>}
+            {error && <p className="text-destructive">{error}</p>}
 
             {!loading && !error && (
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Name</Th>
-                    <Th>Runtime Version</Th>
-                    <Th>Commit Hash</Th>
-                    <Th>Commit Message</Th>
-                    <Th>Timestamp (UTC)</Th>
-                    <Th>File Size</Th>
-                    <Th>Actions</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {releases
-                    .sort(
-                      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                    )
-                    .map((release, index) => (
-                      <Tr key={index}>
-                        <Td>{release.path}</Td>
-                        <Td>{release.runtimeVersion}</Td>
-                        <Td>
-                          <Tooltip label={release.commitHash}>
-                            <Text isTruncated w="10rem">
-                              {release.commitHash}
-                            </Text>
-                          </Tooltip>
-                        </Td>
-                        <Td>
-                          <Tooltip label={release.commitMessage}>
-                            <Text isTruncated w="10rem">
-                              {release.commitMessage}
-                            </Text>
-                          </Tooltip>
-                        </Td>
-                        <Td className="min-w-[14rem]">
-                          {moment(release.timestamp).utc().format('MMM, Do  HH:mm')}
-                        </Td>
-                        <Td>{formatFileSize(release.size)}</Td>
-                        <Td justifyItems="center">
-                          {index === 0 ? (
-                            <Tag size="lg" colorScheme="green">
-                              Active Release
-                            </Tag>
-                          ) : (
-                            <Button
-                              variant="solid"
-                              colorScheme="orange"
-                              size="sm"
-                              onClick={async () => {
-                                setIsOpen(true);
-                                setSelectedRelease(release);
-                              }}>
-                              <AlertDialog
-                                isOpen={isOpen}
-                                leastDestructiveRef={cancelRef}
-                                onClose={() => setIsOpen(false)}
-                                isCentered>
-                                <AlertDialogOverlay>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                      Rollback Release
-                                    </AlertDialogHeader>
-
-                                    <AlertDialogBody>
+              <TooltipProvider>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Runtime Version</TableHead>
+                      <TableHead>Commit Hash</TableHead>
+                      <TableHead>Commit Message</TableHead>
+                      <TableHead>Timestamp (UTC)</TableHead>
+                      <TableHead>File Size</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {releases
+                      .sort(
+                        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                      )
+                      .map((release, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{release.path}</TableCell>
+                          <TableCell>{release.runtimeVersion}</TableCell>
+                          <TableCell>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="block w-40 truncate">{release.commitHash}</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{release.commitHash}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="block w-40 truncate">{release.commitMessage}</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{release.commitMessage}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell className="min-w-[14rem]">
+                            {moment(release.timestamp).utc().format('MMM, Do  HH:mm')}
+                          </TableCell>
+                          <TableCell>{formatFileSize(release.size)}</TableCell>
+                          <TableCell>
+                            {index === 0 ? (
+                              <Badge>Active Release</Badge>
+                            ) : (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => setSelectedRelease(release)}>
+                                    Rollback to this release
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Rollback Release</AlertDialogTitle>
+                                    <AlertDialogDescription>
                                       Are you sure you want to rollback to this release?
-                                      <Tag
-                                        size="lg"
-                                        colorScheme="green"
-                                        mt={4}
-                                        padding={4}
-                                        className="w-full">
-                                        <Text fontSize="sm">
-                                          Commit Hash: {selectedRelease?.commitHash}
-                                        </Text>
-                                      </Tag>
-                                      <Tag size="lg" colorScheme="orange" mt={4} padding={4}>
-                                        <Text fontSize="sm">
-                                          This will promote this release to be the active release
-                                          with a new timestamp.
-                                        </Text>
-                                      </Tag>
-                                    </AlertDialogBody>
-
-                                    <AlertDialogFooter>
-                                      <Button ref={cancelRef} onClick={() => setIsOpen(false)}>
-                                        Cancel
-                                      </Button>
-                                      <Button
-                                        colorScheme="red"
-                                        onClick={async () => {
-                                          const response = await fetch('/api/rollback', {
-                                            method: 'POST',
-                                            headers: {
-                                              'Content-Type': 'application/json',
-                                            },
-                                            body: JSON.stringify({
-                                              path: selectedRelease?.path,
-                                              runtimeVersion: selectedRelease?.runtimeVersion,
-                                              commitHash: selectedRelease?.commitHash,
-                                              commitMessage: selectedRelease?.commitMessage,
-                                            }),
-                                          });
-
-                                          if (!response.ok) {
-                                            throw new Error('Rollback failed');
-                                          }
-
-                                          showToast('Rollback successful', 'success');
-                                          fetchReleases();
-                                          setIsOpen(false);
-                                        }}
-                                        ml={3}>
-                                        Rollback
-                                      </Button>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialogOverlay>
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <div className="space-y-2">
+                                    <Badge className="w-full justify-center p-4">
+                                      Commit Hash: {release.commitHash}
+                                    </Badge>
+                                    <Badge
+                                      variant="secondary"
+                                      className="w-full justify-center p-4">
+                                      This will promote this release to be the active release with a
+                                      new timestamp.
+                                    </Badge>
+                                  </div>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={handleRollback}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                      Rollback
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
                               </AlertDialog>
-                              Rollback to this release
-                            </Button>
-                          )}
-                        </Td>
-                      </Tr>
-                    ))}
-                </Tbody>
-              </Table>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TooltipProvider>
             )}
-          </Flex>
-        </Box>
+          </div>
+        </div>
       </Layout>
     </ProtectedRoute>
   );

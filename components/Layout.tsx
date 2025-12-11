@@ -1,14 +1,21 @@
-import { Box, Flex, VStack, Button, FlexProps } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { FaSignOutAlt, FaTachometerAlt, FaTags } from 'react-icons/fa';
 import Image from 'next/image';
+import { LucideLayoutDashboard, LucideLogOut, LucideTags } from 'lucide-react';
 
-export default function Layout({ children, ...props }: { children: React.ReactNode } & FlexProps) {
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
+
+interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+export default function Layout({ children, className, ...props }: LayoutProps) {
   const router = useRouter();
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <FaTachometerAlt fontSize="1.25rem" /> },
-    { name: 'Releases', path: '/releases', icon: <FaTags fontSize="1.25rem" /> },
+    { name: 'Dashboard', path: '/dashboard', icon: <LucideLayoutDashboard className="h-5 w-5" /> },
+    { name: 'Releases', path: '/releases', icon: <LucideTags className="h-5 w-5" /> },
   ];
 
   const handleLogout = () => {
@@ -17,60 +24,40 @@ export default function Layout({ children, ...props }: { children: React.ReactNo
   };
 
   return (
-    <Box className="w-full" height="100vh" {...props}>
-      <Box
-        w="full"
-        p={4}
-        className=" text-white h-[6rem] border-b-gray-200 border-b-2"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        position="relative">
-        <Box>
-          <Image
-            src="/xavia_logo.png"
-            width={200}
-            height={200}
-            style={{ objectFit: 'contain' }}
-            alt="Xavia Logo"
-          />
-        </Box>
-      </Box>
-      <Flex className="h-[calc(100vh-6rem)] ">
-        <Box
-          w="250px"
-          p={4}
-          className="h-full border-r-gray-200 border-r-2"
-          display="flex"
-          flexDirection="column"
-          justifyContent="space-between">
-          <VStack spacing={4} align="stretch">
+    <div className={cn('w-full h-screen', className)} {...props}>
+      <div className="w-full p-4 text-white h-24 border-b-2 border-b-gray-200 dark:border-b-gray-800 flex items-center justify-center relative">
+        <Image
+          src="/xavia_logo.png"
+          width={200}
+          height={200}
+          style={{ objectFit: 'contain' }}
+          alt="Xavia Logo"
+        />
+      </div>
+      <div className="flex h-[calc(100vh-6rem)]">
+        <div className="w-[250px] p-4 h-full border-r-2 border-r-gray-200 dark:border-r-gray-800 flex flex-col justify-between">
+          <div className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Button
                 key={item.path}
-                variant={router.pathname === item.path ? 'solid' : 'ghost'}
-                colorScheme={router.pathname === item.path ? 'primary' : 'gray'}
-                rightIcon={item.icon}
+                variant={router.pathname === item.path ? 'default' : 'ghost'}
                 onClick={() => router.push(item.path)}
-                justifyContent="space-between">
-                <Box flex="1" textAlign="left">
-                  {item.name}
-                </Box>
+                className="justify-between">
+                <span className="flex-1 text-left">{item.name}</span>
+                {item.icon}
               </Button>
             ))}
-          </VStack>
-          <Button
-            variant="outline"
-            colorScheme="red"
-            onClick={handleLogout}
-            rightIcon={<FaSignOutAlt />}>
-            Logout
-          </Button>
-        </Box>
-        <Box flex={1} p={8}>
-          {children}
-        </Box>
-      </Flex>
-    </Box>
+          </div>
+          <div className="flex flex-col gap-4">
+            <ThemeToggle />
+            <Button variant="outline" onClick={handleLogout} className="justify-between">
+              <span>Logout</span>
+              <LucideLogOut className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+        <div className="flex-1 p-8">{children}</div>
+      </div>
+    </div>
   );
 }

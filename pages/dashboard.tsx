@@ -1,9 +1,12 @@
-import { Card, CardHeader, Heading, CardBody, SimpleGrid } from '@chakra-ui/react';
-import Layout from '../components/Layout';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { TrackingMetrics } from '../apiUtils/database/DatabaseInterface';
 import { useEffect, useState } from 'react';
-import LoadingSpinner from '../components/LoadingSpinner';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import Layout from '@/components/Layout';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import ProtectedRoute from '@/components/ProtectedRoute';
+
+import { TrackingMetrics } from '@/apiUtils/database/DatabaseInterface';
 import { AllTrackingResponse } from './api/tracking/all';
 
 export default function Dashboard() {
@@ -12,6 +15,7 @@ export default function Dashboard() {
   const [androidDownloads, setAndroidDownloads] = useState(0);
   const [totalReleases, setTotalReleases] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+
   const fetchData = async () => {
     try {
       const response = await fetch('/api/tracking/all');
@@ -44,44 +48,44 @@ export default function Dashboard() {
 
   return (
     <ProtectedRoute>
-      <Layout alignItems="center">
-        <SimpleGrid columns={2} spacing={4} mt={4}>
-          <Card bg="primary.500" textColor="white" variant="outline">
-            <CardHeader textAlign="center">
-              <Heading size="md">Total Releases</Heading>
+      <Layout className="items-center">
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <Card className="bg-primary text-primary-foreground">
+            <CardHeader className="text-center">
+              <CardTitle>Total Releases</CardTitle>
             </CardHeader>
-            <CardBody textAlign="center">
-              <Heading size="lg">{totalReleases}</Heading>
-            </CardBody>
+            <CardContent className="text-center">
+              <p className="text-2xl font-bold">{totalReleases}</p>
+            </CardContent>
           </Card>
 
-          <Card bg="primary.500" textColor="white" variant="outline">
-            <CardHeader textAlign="center">
-              <Heading size="md">Total Downloads</Heading>
+          <Card className="bg-primary text-primary-foreground">
+            <CardHeader className="text-center">
+              <CardTitle>Total Downloads</CardTitle>
             </CardHeader>
-            <CardBody textAlign="center">
-              <Heading size="lg">{totalDownloaded}</Heading>
-            </CardBody>
+            <CardContent className="text-center">
+              <p className="text-2xl font-bold">{totalDownloaded}</p>
+            </CardContent>
           </Card>
 
-          <Card bg="primary.500" textColor="white" variant="outline">
-            <CardHeader textAlign="center">
-              <Heading size="md">IOS Downloads</Heading>
+          <Card className="bg-primary text-primary-foreground">
+            <CardHeader className="text-center">
+              <CardTitle>iOS Downloads</CardTitle>
             </CardHeader>
-            <CardBody textAlign="center">
-              <Heading size="lg">{iosDownloads}</Heading>
-            </CardBody>
+            <CardContent className="text-center">
+              <p className="text-2xl font-bold">{iosDownloads}</p>
+            </CardContent>
           </Card>
 
-          <Card bg="primary.500" textColor="white" variant="outline">
-            <CardHeader textAlign="center">
-              <Heading size="md">Android Downloads</Heading>
+          <Card className="bg-primary text-primary-foreground">
+            <CardHeader className="text-center">
+              <CardTitle>Android Downloads</CardTitle>
             </CardHeader>
-            <CardBody textAlign="center">
-              <Heading size="lg">{androidDownloads}</Heading>
-            </CardBody>
+            <CardContent className="text-center">
+              <p className="text-2xl font-bold">{androidDownloads}</p>
+            </CardContent>
           </Card>
-        </SimpleGrid>
+        </div>
       </Layout>
     </ProtectedRoute>
   );

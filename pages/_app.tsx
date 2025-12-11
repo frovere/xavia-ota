@@ -1,12 +1,16 @@
 import { AppProps } from 'next/app';
-import Providers from './ChakraProvider';
-import '../styles/globals.css';
+import { ThemeProvider } from 'next-themes';
+
+import { Toaster } from '@/components/ui/sonner';
+
+import '@/styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <Providers>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <Component {...pageProps} />
-    </Providers>
+      <Toaster />
+    </ThemeProvider>
   );
 }
 
