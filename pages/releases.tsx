@@ -1,6 +1,8 @@
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { LucideRefreshCw } from 'lucide-react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { isServer, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 
 import {
   AlertDialog,
@@ -24,7 +26,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
 import Layout from '@/components/layout';
 import ProtectedRoute from '@/components/protected-route';
 import { showToast } from '@/components/toast';
@@ -38,57 +39,154 @@ interface Release {
   commitMessage: string | null;
 }
 
-export default function ReleasesPage() {
-  const [releases, setReleases] = useState<Release[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
+async function fetchReleases() {
+  if (isServer) {
+    return [] as Release[];
+  }
+  const response = await fetch('/api/releases');
+  if (!response.ok) {
+    throw new Error('Failed to fetch releases');
+  }
+  const data = await response.json();
+  return data.releases as Release[];
+}
 
-  useEffect(() => {
-    fetchReleases();
-  }, []);
+async function postRollback({ path, runtimeVersion, commitHash, commitMessage }: Release) {
+  const response = await fetch('/api/rollback', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      path,
+      runtimeVersion,
+      commitHash,
+      commitMessage,
+    }),
+  });
 
-  const fetchReleases = async () => {
-    try {
-      const response = await fetch('/api/releases');
-      if (!response.ok) {
-        throw new Error('Failed to fetch releases');
-      }
-      const data = await response.json();
-      setReleases(data.releases);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch releases');
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!response.ok) {
+    throw new Error('Rollback failed');
+  }
 
-  const handleRollback = async () => {
-    if (!selectedRelease) return;
+  return (await response.json()) as { success: true; newPath: string };
+}
 
-    try {
-      const response = await fetch('/api/rollback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: selectedRelease.path,
-          runtimeVersion: selectedRelease.runtimeVersion,
-          commitHash: selectedRelease.commitHash,
-          commitMessage: selectedRelease.commitMessage,
-        }),
-      });
+function ReleasesData() {
+  const { data: releases } = useSuspenseQuery({
+    queryKey: ['releases'],
+    queryFn: async () => await fetchReleases(),
+  });
 
-      if (!response.ok) {
-        throw new Error('Rollback failed');
-      }
-
+  const { mutate: handleRollback } = useMutation({
+    mutationFn: (release: Release) => postRollback(release),
+    onSuccess: (_data, _vars, _result, { client }) => {
       showToast('Rollback successful', 'success');
-      fetchReleases();
-    } catch {
+      void client.invalidateQueries({ queryKey: ['releases'] });
+    },
+    onError: () => {
       showToast('Rollback failed', 'error');
-    }
+    },
+  });
+
+  return (
+    <TooltipProvider>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Runtime Version</TableHead>
+            <TableHead>Commit Hash</TableHead>
+            <TableHead>Commit Message</TableHead>
+            <TableHead>Timestamp (UTC)</TableHead>
+            <TableHead>File Size</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {releases
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .map((release, index) => (
+              <TableRow key={release.timestamp}>
+                <TableCell>{release.path}</TableCell>
+                <TableCell>{release.runtimeVersion}</TableCell>
+                <TableCell>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="block w-40 truncate">{release.commitHash}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{release.commitHash}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="block w-40 truncate">{release.commitMessage}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{release.commitMessage}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableCell>
+                <TableCell className="min-w-[14rem]">
+                  {moment(release.timestamp).utc().format('MMM, Do  HH:mm')}
+                </TableCell>
+                <TableCell>{formatFileSize(release.size)}</TableCell>
+                <TableCell>
+                  {index === 0 ? (
+                    <Badge>Active Release</Badge>
+                  ) : (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="secondary" size="sm">
+                          Rollback to this release
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Rollback Release</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to rollback to this release?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="space-y-2">
+                          <Badge className="w-full justify-center p-4">
+                            Commit Hash: {release.commitHash}
+                          </Badge>
+                          <Badge variant="secondary" className="w-full justify-center p-4">
+                            This will promote this release to be the active release with a new
+                            timestamp.
+                          </Badge>
+                        </div>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              handleRollback(release);
+                            }}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Rollback
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </TooltipProvider>
+  );
+}
+
+export default function ReleasesPage() {
+  const queryClient = useQueryClient();
+
+  const fetchReleases = () => {
+    void queryClient.invalidateQueries({ queryKey: ['releases'] });
   };
 
   return (
@@ -102,109 +200,12 @@ export default function ReleasesPage() {
                 <LucideRefreshCw className="h-4 w-4" />
               </Button>
             </div>
-
-            {loading && <p>Loading...</p>}
-            {error && <p className="text-destructive">{error}</p>}
-
-            {!loading && !error && (
-              <TooltipProvider>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Runtime Version</TableHead>
-                      <TableHead>Commit Hash</TableHead>
-                      <TableHead>Commit Message</TableHead>
-                      <TableHead>Timestamp (UTC)</TableHead>
-                      <TableHead>File Size</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {releases
-                      .sort(
-                        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                      )
-                      .map((release, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{release.path}</TableCell>
-                          <TableCell>{release.runtimeVersion}</TableCell>
-                          <TableCell>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="block w-40 truncate">{release.commitHash}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{release.commitHash}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="block w-40 truncate">{release.commitMessage}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{release.commitMessage}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell className="min-w-[14rem]">
-                            {moment(release.timestamp).utc().format('MMM, Do  HH:mm')}
-                          </TableCell>
-                          <TableCell>{formatFileSize(release.size)}</TableCell>
-                          <TableCell>
-                            {index === 0 ? (
-                              <Badge>Active Release</Badge>
-                            ) : (
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => setSelectedRelease(release)}
-                                  >
-                                    Rollback to this release
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Rollback Release</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to rollback to this release?
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <div className="space-y-2">
-                                    <Badge className="w-full justify-center p-4">
-                                      Commit Hash: {release.commitHash}
-                                    </Badge>
-                                    <Badge
-                                      variant="secondary"
-                                      className="w-full justify-center p-4"
-                                    >
-                                      This will promote this release to be the active release with a
-                                      new timestamp.
-                                    </Badge>
-                                  </div>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={handleRollback}
-                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    >
-                                      Rollback
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TooltipProvider>
-            )}
+            <ErrorBoundary
+              fallbackRender={({ error }) => <p className="text-destructive">{error.message}</p>}>
+              <Suspense fallback={<p>Loading releases...</p>}>
+                <ReleasesData />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       </Layout>
