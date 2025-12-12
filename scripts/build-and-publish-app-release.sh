@@ -48,7 +48,12 @@ zip -q -r ${timestamp}.zip .
 
 
 # Upload the zip file to the server
-curl -X POST $serverHost/api/upload -F "file=@${timestamp}.zip" -F "runtimeVersion=$runtimeVersion" -F "commitHash=$commitHash" -F "commitMessage=$commitMessage" -F "uploadKey=$uploadKey"
+curl -X POST $serverHost/api/upload \
+  -F "file=@${timestamp}.zip" \
+  -F "runtimeVersion=$runtimeVersion" \
+  -F "commitHash=$commitHash" \
+  -F "commitMessage=$commitMessage" \
+  -H "Authorization: Bearer $uploadKey"
 
 echo ""
 

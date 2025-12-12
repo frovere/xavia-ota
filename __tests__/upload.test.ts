@@ -33,7 +33,6 @@ describe('Upload API', () => {
     const mockForm = {
       parse: jest.fn().mockResolvedValue([
         {
-          uploadKey: [process.env.UPLOAD_KEY],
           runtimeVersion: ['1.0.0'],
           commitHash: ['abc123'],
           commitMessage: ['Test commit message'],
@@ -74,7 +73,7 @@ describe('Upload API', () => {
     (DatabaseFactory.getDatabase as jest.Mock).mockReturnValue(mockDatabase);
 
     // Execute test
-    const { req, res } = createMocks({ method: 'POST' });
+    const { req, res } = createMocks({ method: 'POST', headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` } });
     await uploadHandler(req, res);
 
     // Verify results
@@ -103,10 +102,24 @@ describe('Upload API', () => {
 
     (formidable as unknown as jest.Mock).mockReturnValue(mockForm);
 
-    const { req, res } = createMocks({ method: 'POST' });
+    const { req, res } = createMocks({ method: 'POST', headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` } });
     await uploadHandler(req, res);
 
     expect(res._getStatusCode()).toBe(400);
+    expect(JSON.parse(res._getData())).toMatchSnapshot();
+  });
+
+  it('should return 401 for missing bearer token', async () => {
+    const mockForm = {
+      parse: jest.fn().mockResolvedValue([{}, {}]),
+    };
+
+    (formidable as unknown as jest.Mock).mockReturnValue(mockForm);
+
+    const { req, res } = createMocks({ method: 'POST' });
+    await uploadHandler(req, res);
+
+    expect(res._getStatusCode()).toBe(401);
     expect(JSON.parse(res._getData())).toMatchSnapshot();
   });
 });
