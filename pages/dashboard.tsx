@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Layout from '@/components/layout';
 import LoadingSpinner from '@/components/loading-spinner';
 import ProtectedRoute from '@/components/protected-route';
-import type { TrackingMetrics } from '@/api-utils/database/database-interface';
 import type { AllTrackingResponse } from './api/tracking/all';
 
 async function fetchTrackingData() {
@@ -25,13 +24,15 @@ function DashboardData() {
     queryKey: ['tracking-data'],
     queryFn: async () => await fetchTrackingData(),
   });
-  const iosData = data.trackings.filter((metric: TrackingMetrics) => metric.platform === 'ios');
-  const androidData = data.trackings.filter(
-    (metric: TrackingMetrics) => metric.platform === 'android',
+  const { totalDownloaded, iosDownloads, androidDownloads } = data.trackings.reduce(
+    (acc, curr) => {
+      acc.totalDownloaded += curr.count;
+      acc.iosDownloads += curr.platform === 'ios' ? curr.count : 0;
+      acc.androidDownloads += curr.platform === 'android' ? curr.count : 0;
+      return acc;
+    },
+    { totalDownloaded: 0, iosDownloads: 0, androidDownloads: 0 },
   );
-  const totalDownloaded = data.trackings.reduce((acc, curr) => acc + curr.count, 0);
-  const iosDownloads = iosData.reduce((acc, curr) => acc + curr.count, 0);
-  const androidDownloads = androidData.reduce((acc, curr) => acc + curr.count, 0);
 
   return (
     <div className="grid grid-cols-2 gap-4 mt-4">
@@ -78,7 +79,7 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <Layout className="items-center">
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<LoadingSpinner size="lg" />}>
           <DashboardData />
         </Suspense>
       </Layout>
