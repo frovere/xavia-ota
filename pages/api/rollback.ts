@@ -1,4 +1,5 @@
-import moment from 'moment';
+import { format } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
@@ -30,7 +31,7 @@ export default async function rollbackHandler(req: NextApiRequest, res: NextApiR
   try {
     const storage = StorageFactory.getStorage();
 
-    const timestamp = moment().utc().format('YYYYMMDDHHmmss');
+    const timestamp = format(new UTCDate(), 'yyyyMMddHHmmss');
     const newPath = `updates/${runtimeVersion}/${timestamp}.zip`;
 
     await storage.copyFile(path, newPath);
@@ -38,7 +39,7 @@ export default async function rollbackHandler(req: NextApiRequest, res: NextApiR
     await DatabaseFactory.getDatabase().createRelease({
       path: newPath,
       runtimeVersion,
-      timestamp: moment().utc().toString(),
+      timestamp: new UTCDate().toISOString(),
       commitHash,
       commitMessage,
     });

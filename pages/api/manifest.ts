@@ -10,7 +10,7 @@ import { UpdateHelper, NoUpdateAvailableError } from '@/api-utils/helpers/update
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { getLogger } from '@/api-utils/logger';
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import moment from 'moment';
+import { UTCDate } from '@date-fns/utc';
 
 const logger = getLogger('manifest');
 
@@ -247,7 +247,7 @@ async function putUpdateInResponseAsync(
     await database.createTracking({
       platform,
       releaseId: release.id,
-      downloadTimestamp: moment().utc().toISOString(),
+      downloadTimestamp: new UTCDate().toISOString(),
     });
   }
 }

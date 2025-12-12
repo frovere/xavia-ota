@@ -1,4 +1,5 @@
-import moment from 'moment';
+import { format } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
 import winston from 'winston';
 
 const { combine, printf, colorize, align, errors, metadata } = winston.format;
@@ -50,7 +51,7 @@ const logger = winston.createLogger({
       const { timestamp, level, message: logMessage, ...metadata } = info;
       const { loggerName } = metadata.metadata as { loggerName: string };
 
-      const msg = `[${moment().utc().format('YYYY-MM-DD HH:mm:ss')}] [${level}] ${padLoggerName(
+      const msg = `[${format(new UTCDate(), 'yyyy-MM-dd HH:mm:ss')}] [${level}] ${padLoggerName(
         '[' + loggerName + ']',
         60,
       )} ${logMessage} ${formatMeta(metadata)}`;

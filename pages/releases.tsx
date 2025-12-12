@@ -1,4 +1,5 @@
-import moment from 'moment';
+import { format } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
 import { Suspense } from 'react';
 import { LucideRefreshCw } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -131,7 +132,7 @@ function ReleasesData() {
                   </Tooltip>
                 </TableCell>
                 <TableCell className="min-w-[14rem]">
-                  {moment(release.timestamp).utc().format('MMM, Do  HH:mm')}
+                  {format(new UTCDate(release.timestamp), 'MMM, do  HH:mm')}
                 </TableCell>
                 <TableCell>{formatFileSize(release.size)}</TableCell>
                 <TableCell>

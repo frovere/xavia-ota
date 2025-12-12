@@ -1,6 +1,7 @@
 import formidable from 'formidable';
 import fs from 'fs';
-import moment from 'moment';
+import { format } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
 import { NextApiRequest, NextApiResponse } from 'next';
 import AdmZip from 'adm-zip';
 
@@ -42,7 +43,7 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
     }
 
     const storage = StorageFactory.getStorage();
-    const timestamp = moment().utc().format('YYYYMMDDHHmmss');
+    const timestamp = format(new UTCDate(), 'yyyyMMddHHmmss');
     const updatePath = `updates/${runtimeVersion}`;
 
     // Store the zipped file as is
@@ -58,7 +59,7 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
     await DatabaseFactory.getDatabase().createRelease({
       path,
       runtimeVersion,
-      timestamp: moment().utc().toString(),
+      timestamp: new UTCDate().toISOString(),
       commitHash,
       commitMessage,
       updateId,
