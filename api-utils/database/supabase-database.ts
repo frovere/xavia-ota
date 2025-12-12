@@ -24,7 +24,7 @@ export class SupabaseDatabase implements DatabaseInterface {
       .eq('runtime_version', runtimeVersion)
       .order('timestamp', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
 
