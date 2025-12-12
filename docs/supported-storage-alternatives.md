@@ -37,9 +37,11 @@ S3_ENDPOINT=your-s3-endpoint
 S3_ACCESS_KEY_ID=your-access-key-id
 S3_SECRET_ACCESS_KEY=your-secret-access-key
 S3_BUCKET_NAME=your-s3-bucket-name
+S3_ROOT_DIRECTORY=your-s3-root-directory (optional)
 ```
 - Support all S3 compatible storage (AWS S3, Digital Ocean Spaces, Cloudflare R2, etc.)
 - Bucket should be created manually before starting the server
+- If you set `S3_ROOT_DIRECTORY`, it will prefix all storage keys inside the bucket. Do not include spaces in the root; the server will remove whitespace from this value.
 
 ## Supported Database Providers
 Database configuration is managed via `DB_TYPE`.

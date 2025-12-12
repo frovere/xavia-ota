@@ -11,6 +11,7 @@ import { StorageInterface } from './storage-interface';
 export class S3Storage implements StorageInterface {
   private readonly client: S3Client;
   private readonly bucketName: string;
+  private readonly rootDirectory: string;
 
   constructor() {
     if (!process.env.S3_ACCESS_KEY_ID || !process.env.S3_SECRET_ACCESS_KEY) {
@@ -28,21 +29,50 @@ export class S3Storage implements StorageInterface {
       },
     });
     this.bucketName = process.env.S3_BUCKET_NAME;
+    this.rootDirectory = this.normalizeRoot(process.env.S3_ROOT_DIRECTORY);
+  }
+
+  private normalizeKey(input: string): string {
+    if (!input) return '';
+    let k = input.replace(/\\/g, '/');
+    k = k.trim();
+    k = k.replace(/^\/+/g, '');
+    k = k.replace(/\/+/g, '/');
+    return k;
+  }
+
+  private normalizeRoot(root?: string): string {
+    if (!root) return '';
+    let r = this.normalizeKey(root);
+    r = r.replace(/\/+$/g, '');
+    r = r.replace(/\s+/g, '');
+    return r;
+  }
+
+  private withRootKey(path: string): string {
+    const normalizedPath = this.normalizeKey(path);
+    if (!this.rootDirectory) return normalizedPath;
+    if (!normalizedPath) return this.rootDirectory;
+    return `${this.rootDirectory}/${normalizedPath}`;
   }
 
   async copyFile(sourcePath: string, destinationPath: string): Promise<void> {
+    const sourceKey = this.withRootKey(sourcePath);
+    const destKey = this.withRootKey(destinationPath);
+    const encodedSource = encodeURIComponent(sourceKey).replace(/%2F/g, '/');
     const copyCommand = new CopyObjectCommand({
       Bucket: this.bucketName,
-      CopySource: sourcePath,
-      Key: destinationPath,
+      CopySource: `${this.bucketName}/${encodedSource}`,
+      Key: destKey,
     });
     await this.client.send(copyCommand);
   }
 
   async downloadFile(path: string): Promise<Buffer> {
+    const key = this.withRootKey(path);
     const getCommand = new GetObjectCommand({
       Bucket: this.bucketName,
-      Key: path,
+      Key: key,
     });
     const response = await this.client.send(getCommand);
     const body = await response.Body?.transformToByteArray();
@@ -53,19 +83,27 @@ export class S3Storage implements StorageInterface {
   }
 
   async fileExists(path: string): Promise<boolean> {
-    try {
-      const files = await this.listDirectories(path);
-      if (files.length > 0) {
-        return true;
-      }
-    } catch {}
+    const normalizedPath = this.normalizeKey(path);
+    const key = this.withRootKey(normalizedPath);
+    if (!key) return false;
     try {
       const headCommand = new HeadObjectCommand({
         Bucket: this.bucketName,
-        Key: path.split('/').shift(),
+        Key: key,
       });
       await this.client.send(headCommand);
       return true;
+    } catch {}
+
+    try {
+      const prefix = key.endsWith('/') ? key : `${key}/`;
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: prefix,
+        MaxKeys: 1,
+      });
+      const resp = await this.client.send(listCommand);
+      return (resp.KeyCount ?? 0) > 0;
     } catch {
       return false;
     }
@@ -79,15 +117,16 @@ export class S3Storage implements StorageInterface {
       metadata: { size: number; mimetype: string };
     }[]
   > {
-    const prefix = `${directory}/`;
+    const normalizedDir = this.normalizeKey(directory);
+    const s3Prefix = normalizedDir ? `${this.withRootKey(normalizedDir)}/` : (this.rootDirectory ? `${this.rootDirectory}/` : '');
     const listCommand = new ListObjectsV2Command({
       Bucket: this.bucketName,
-      Prefix: prefix,
+      Prefix: s3Prefix,
     });
     const response = await this.client.send(listCommand);
     return (
       response.Contents?.map((file) => ({
-        name: file.Key!.replace(prefix, ''),
+        name: file.Key!.replace(s3Prefix, ''),
         updated_at: file.LastModified?.toISOString() ?? '',
         created_at: file.LastModified?.toISOString() ?? '',
         metadata: {
@@ -99,23 +138,26 @@ export class S3Storage implements StorageInterface {
   }
 
   async listDirectories(directory: string): Promise<string[]> {
+    const normalizedDir = this.normalizeKey(directory);
+    const s3Prefix = normalizedDir ? `${this.withRootKey(normalizedDir)}` : (this.rootDirectory ? `${this.rootDirectory}` : '');
     const listCommand = new ListObjectsV2Command({
       Bucket: this.bucketName,
-      Prefix: directory,
+      Prefix: s3Prefix,
       Delimiter: '/',
     });
     const response = await this.client.send(listCommand);
     return (
       response.CommonPrefixes?.map((prefix) =>
-        prefix.Prefix!.replace(directory, '').replace(/\/$/, ''),
+        prefix.Prefix!.replace(s3Prefix, '').replace(/\/$/, ''),
       ) ?? []
     );
   }
 
   async uploadFile(path: string, file: Buffer): Promise<string> {
+    const key = this.withRootKey(path);
     const uploadCommand = new PutObjectCommand({
       Bucket: this.bucketName,
-      Key: path,
+      Key: key,
       Body: file,
     });
     await this.client.send(uploadCommand);
