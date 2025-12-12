@@ -20,7 +20,7 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
-    router.push('/');
+    void router.push('/');
   };
 
   return (
@@ -42,8 +42,7 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
                 key={item.path}
                 variant={router.pathname === item.path ? 'default' : 'ghost'}
                 onClick={() => router.push(item.path)}
-                className="justify-between"
-              >
+                className="justify-between">
                 <span className="flex-1 text-left">{item.name}</span>
                 {item.icon}
               </Button>

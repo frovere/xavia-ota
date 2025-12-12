@@ -7,7 +7,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     if (!isAuthenticated) {
-      router.push('/');
+      void router.push('/');
     }
   }, [router]);
 
