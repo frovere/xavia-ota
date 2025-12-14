@@ -139,7 +139,7 @@ function ReleasesData() {
                     </TooltipContent>
                   </Tooltip>
                 </TableCell>
-                <TableCell className="min-w-[14rem]">
+                <TableCell className="min-w-40">
                   {format(new UTCDate(release.timestamp), 'MMM, do  HH:mm')}
                 </TableCell>
                 <TableCell>{formatFileSize(release.size)}</TableCell>
@@ -161,7 +161,7 @@ function ReleasesData() {
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="space-y-2">
-                          <Badge className="w-full justify-center p-4">
+                          <Badge variant="outline" className="w-full justify-center p-4">
                             Commit Hash: {release.commitHash}
                           </Badge>
                           <Badge variant="secondary" className="w-full justify-center p-4">
@@ -197,21 +197,19 @@ export default function ReleasesPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="mx-4">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold">Releases</h1>
-              <Button variant="outline" size="icon" onClick={() => refetch()}>
-                <LucideRefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-            <ErrorBoundary
-              fallbackRender={({ error }) => <p className="text-destructive">{error.message}</p>}>
-              <Suspense fallback={<p>Loading releases...</p>}>
-                <ReleasesData />
-              </Suspense>
-            </ErrorBoundary>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Releases</h1>
+            <Button variant="outline" size="icon" onClick={() => refetch()}>
+              <LucideRefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
+          <ErrorBoundary
+            fallbackRender={({ error }) => <p className="text-destructive">{error.message}</p>}>
+            <Suspense fallback={<p>Loading releases...</p>}>
+              <ReleasesData />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </Layout>
     </ProtectedRoute>

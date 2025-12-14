@@ -78,7 +78,7 @@ function DashboardData() {
 export default function Dashboard() {
   return (
     <ProtectedRoute>
-      <Layout className="items-center">
+      <Layout>
         <Suspense fallback={<LoadingSpinner size="lg" />}>
           <DashboardData />
         </Suspense>

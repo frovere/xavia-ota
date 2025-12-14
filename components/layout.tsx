@@ -35,7 +35,7 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
         />
       </div>
       <div className="flex h-[calc(100vh-6rem)]">
-        <div className="w-[250px] p-4 h-full border-r-2 border-r-gray-200 dark:border-r-gray-800 flex flex-col justify-between">
+        <div className="w-62.5 p-4 h-full border-r-2 border-r-gray-200 dark:border-r-gray-800 flex flex-col justify-between">
           <div className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Button
