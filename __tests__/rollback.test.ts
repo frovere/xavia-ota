@@ -36,6 +36,7 @@ describe('Rollback API', () => {
 
     const mockDatabase = {
       createRelease: jest.fn().mockResolvedValue(true),
+      getReleaseByPath: jest.fn().mockResolvedValue({ updateId: '123456' }),
     };
 
     (StorageFactory.getStorage as jest.Mock).mockReturnValue(mockStorage);

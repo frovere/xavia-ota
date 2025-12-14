@@ -36,12 +36,15 @@ export default async function rollbackHandler(req: NextApiRequest, res: NextApiR
 
     await storage.copyFile(path, newPath);
 
+    const oldRelease = await DatabaseFactory.getDatabase().getReleaseByPath(path);
+
     await DatabaseFactory.getDatabase().createRelease({
       path: newPath,
       runtimeVersion,
       timestamp: new UTCDate().toISOString(),
       commitHash,
       commitMessage,
+      updateId: oldRelease?.updateId ?? null,
     });
 
     res.status(200).json({ success: true, newPath });

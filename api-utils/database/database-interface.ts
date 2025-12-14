@@ -5,7 +5,7 @@ export interface Release {
   timestamp: string;
   commitHash: string;
   commitMessage: string;
-  updateId?: string;
+  updateId: string | null;
 }
 
 export interface Tracking {

@@ -48,11 +48,23 @@ export class SupabaseDatabase implements DatabaseInterface {
       .from(Tables.RELEASES)
       .select()
       .eq('path', path)
-      .single();
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
 
-    return data || null;
+    if (data) {
+      return {
+        id: data.id,
+        runtimeVersion: data.runtime_version,
+        path: data.path,
+        timestamp: data.timestamp,
+        commitHash: data.commit_hash,
+        commitMessage: data.commit_message,
+        updateId: data.update_id,
+      };
+    }
+
+    return null;
   }
 
   async getReleaseTrackingMetricsForAllReleases(): Promise<TrackingMetrics[]> {
@@ -142,18 +154,23 @@ export class SupabaseDatabase implements DatabaseInterface {
       .from(Tables.RELEASES)
       .select()
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
-    return {
-      id: data.id,
-      path: data.path,
-      runtimeVersion: data.runtime_version,
-      timestamp: data.timestamp,
-      commitHash: data.commit_hash,
-      commitMessage: data.commit_message,
-    };
+    if (data) {
+      return {
+        id: data.id,
+        path: data.path,
+        runtimeVersion: data.runtime_version,
+        timestamp: data.timestamp,
+        commitHash: data.commit_hash,
+        commitMessage: data.commit_message,
+        updateId: data.update_id,
+      };
+    }
+
+    return null;
   }
 
   async listReleases(): Promise<Release[]> {
@@ -171,6 +188,7 @@ export class SupabaseDatabase implements DatabaseInterface {
       size: release.size,
       commitHash: release.commit_hash,
       commitMessage: release.commit_message,
+      updateId: release.update_id,
     }));
   }
 }
