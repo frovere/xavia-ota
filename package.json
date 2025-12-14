@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "make -f ./scripts/dev/Makefile",
-    "next:dev": "next dev --turbopack",
-    "build": "next build  --turbopack",
-    "start": "next start",
+    "next:dev": "bun --bun next dev --turbopack",
+    "build": "bun --bun next build --turbopack",
+    "start": "bun --bun next start",
     "lint": "eslint api-utils pages",
     "test": "jest",
     "prepare": "husky",
