@@ -1,5 +1,11 @@
 import { Suspense } from 'react';
-import { isServer, useSuspenseQuery } from '@tanstack/react-query';
+import {
+  dehydrate,
+  isServer,
+  QueryClient,
+  queryOptions,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Layout from '@/components/layout';
@@ -7,11 +13,10 @@ import LoadingSpinner from '@/components/loading-spinner';
 import ProtectedRoute from '@/components/protected-route';
 import type { AllTrackingResponse } from './api/tracking/all';
 
+const baseUrl = isServer ? (process.env.HOST ?? 'http://localhost:3000') : '';
+
 async function fetchTrackingData() {
-  if (isServer) {
-    return { totalReleases: 0, trackings: [] } as AllTrackingResponse;
-  }
-  const res = await fetch('/api/tracking/all');
+  const res = await fetch(`${baseUrl}/api/tracking/all`);
   if (!res.ok) {
     throw new Error('Failed to fetch tracking data');
   }
@@ -19,11 +24,25 @@ async function fetchTrackingData() {
   return data as AllTrackingResponse;
 }
 
+const queryOpts = queryOptions({
+  queryKey: ['tracking-data'],
+  queryFn: async () => await fetchTrackingData(),
+  staleTime: 1000 * 30,
+});
+
+export async function getServerSideProps() {
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery(queryOpts);
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+}
+
 function DashboardData() {
-  const { data } = useSuspenseQuery({
-    queryKey: ['tracking-data'],
-    queryFn: async () => await fetchTrackingData(),
-  });
+  const { data } = useSuspenseQuery(queryOpts);
   const { totalDownloaded, iosDownloads, androidDownloads } = data.trackings.reduce(
     (acc, curr) => {
       acc.totalDownloaded += curr.count;

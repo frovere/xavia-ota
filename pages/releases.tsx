@@ -4,7 +4,9 @@ import { Suspense } from 'react';
 import { LucideRefreshCw } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
+  dehydrate,
   isServer,
+  QueryClient,
   queryOptions,
   useMutation,
   useQuery,
@@ -46,11 +48,10 @@ interface Release {
   commitMessage: string | null;
 }
 
+const baseUrl = isServer ? (process.env.HOST ?? 'http://localhost:3000') : '';
+
 async function fetchReleases() {
-  if (isServer) {
-    return [] as Release[];
-  }
-  const response = await fetch('/api/releases');
+  const response = await fetch(`${baseUrl}/api/releases`);
   if (!response.ok) {
     throw new Error('Failed to fetch releases');
   }
@@ -82,7 +83,19 @@ async function postRollback({ path, runtimeVersion, commitHash, commitMessage }:
 const queryOpts = queryOptions({
   queryKey: ['releases'],
   queryFn: async () => await fetchReleases(),
+  staleTime: 1000 * 60 * 5,
 });
+
+export async function getServerSideProps() {
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery(queryOpts);
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+}
 
 function ReleasesData() {
   const { data: releases } = useSuspenseQuery(queryOpts);
@@ -197,10 +210,10 @@ export default function ReleasesPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">Releases</h1>
-            <Button variant="outline" size="icon" onClick={() => refetch()}>
+            <Button variant="outline" size="icon" onClick={() => refetch()} disabled={isRefetching}>
               <LucideRefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
             </Button>
           </div>

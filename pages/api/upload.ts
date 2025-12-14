@@ -23,7 +23,8 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
   }
 
   if (req.headers.authorization !== `Bearer ${process.env.UPLOAD_KEY}`) {
-    return res.status(401).json({ error: "Unauthorized: wrong upload key" });
+    res.status(401).json({ error: 'Unauthorized: wrong upload key' });
+    return;
   }
 
   const form = formidable({});
