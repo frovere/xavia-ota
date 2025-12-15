@@ -118,7 +118,11 @@ export class S3Storage implements StorageInterface {
     }[]
   > {
     const normalizedDir = this.normalizeKey(directory);
-    const s3Prefix = normalizedDir ? `${this.withRootKey(normalizedDir)}/` : (this.rootDirectory ? `${this.rootDirectory}/` : '');
+    const s3Prefix = normalizedDir
+      ? `${this.withRootKey(normalizedDir)}/`
+      : this.rootDirectory
+        ? `${this.rootDirectory}/`
+        : '';
     const listCommand = new ListObjectsV2Command({
       Bucket: this.bucketName,
       Prefix: s3Prefix,
@@ -139,7 +143,11 @@ export class S3Storage implements StorageInterface {
 
   async listDirectories(directory: string): Promise<string[]> {
     const normalizedDir = this.normalizeKey(directory);
-    const s3Prefix = normalizedDir ? `${this.withRootKey(normalizedDir)}` : (this.rootDirectory ? `${this.rootDirectory}` : '');
+    const s3Prefix = normalizedDir
+      ? `${this.withRootKey(normalizedDir)}`
+      : this.rootDirectory
+        ? `${this.rootDirectory}`
+        : '';
     const listCommand = new ListObjectsV2Command({
       Bucket: this.bucketName,
       Prefix: s3Prefix,

@@ -25,7 +25,7 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
 
   return (
     <div className={cn('w-full h-screen', className)} {...props}>
-      <div className="w-full p-4 text-white h-24 border-b-2 border-b-gray-200 dark:border-b-gray-800 flex items-center justify-center relative">
+      <div className="w-full p-4 text-white h-24 border-b-2 border-b-zinc-200 dark:border-b-zinc-800 flex items-center justify-center relative">
         <Image
           src="/xavia_logo.png"
           width={200}
@@ -35,7 +35,7 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
         />
       </div>
       <div className="flex h-[calc(100vh-6rem)]">
-        <div className="w-62.5 p-4 h-full border-r-2 border-r-gray-200 dark:border-r-gray-800 flex flex-col justify-between">
+        <div className="w-62.5 p-4 h-full border-r-2 border-r-zinc-200 dark:border-r-zinc-800 flex flex-col justify-between">
           <div className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Button
