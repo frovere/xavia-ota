@@ -1,115 +1,72 @@
-import { Pool } from 'pg';
+import { count, desc, eq } from 'drizzle-orm';
 
-import { DatabaseInterface, Release, Tracking, TrackingMetrics } from './database-interface';
-import { Tables } from './database-factory';
+import { db } from '@/db';
+import { releases, releasesTracking } from '@/db/schema';
+import { DatabaseInterface, TrackingMetrics } from './database-interface';
 
 export class PostgresDatabase implements DatabaseInterface {
-  private readonly pool: Pool;
-
-  constructor() {
-    this.pool = new Pool({
-      user: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
-      host: process.env.POSTGRES_HOST,
-      port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
-    });
-  }
-  async getLatestReleaseRecordForRuntimeVersion(runtimeVersion: string): Promise<Release | null> {
-    const query = `
-      SELECT id, runtime_version as "runtimeVersion", path, timestamp, commit_hash as "commitHash", update_id as "updateId"
-      FROM ${Tables.RELEASES} WHERE runtime_version = $1
-      ORDER BY timestamp DESC
-      LIMIT 1
-    `;
-
-    const { rows } = await this.pool.query(query, [runtimeVersion]);
-    return rows[0] || null;
-  }
-  async getReleaseByPath(path: string): Promise<Release | null> {
-    const query = `
-      SELECT id, runtime_version as "runtimeVersion", path, timestamp, commit_hash as "commitHash", update_id as "updateId"
-      FROM ${Tables.RELEASES} WHERE path = $1
-    `;
-    const { rows } = await this.pool.query(query, [path]);
-    return rows[0] || null;
+  async getLatestReleaseRecordForRuntimeVersion(
+    runtimeVersion: string,
+  ): Promise<typeof releases.$inferSelect | null> {
+    const result = await db
+      .select()
+      .from(releases)
+      .where(eq(releases.runtimeVersion, runtimeVersion))
+      .limit(1);
+    return result[0] || null;
   }
 
-  async createTracking(tracking: Omit<Tracking, 'id'>): Promise<Tracking> {
-    const query = `
-      INSERT INTO ${Tables.RELEASES_TRACKING} (release_id, platform)
-      VALUES ($1, $2)
-      RETURNING id, release_id as "releaseId", download_timestamp as "downloadTimestamp", platform
-    `;
-    const values = [tracking.releaseId, tracking.platform];
-    const { rows } = await this.pool.query(query, values);
-    return rows[0];
+  async getReleaseByPath(path: string): Promise<typeof releases.$inferSelect | null> {
+    const result = await db.select().from(releases).where(eq(releases.path, path)).limit(1);
+    return result[0] || null;
+  }
+
+  async createTracking(
+    tracking: typeof releasesTracking.$inferInsert,
+  ): Promise<typeof releasesTracking.$inferSelect> {
+    const result = await db.insert(releasesTracking).values(tracking).returning();
+    return result[0];
   }
 
   async getReleaseTrackingMetrics(releaseId: string): Promise<TrackingMetrics[]> {
-    const query = `
-      SELECT platform, COUNT(*) as count
-      FROM ${Tables.RELEASES_TRACKING}
-      WHERE release_id = $1
-      GROUP BY platform
-    `;
-    const { rows } = await this.pool.query(query, [releaseId]);
-    return rows.map((row) => ({
-      platform: row.platform,
-      count: Number(row.count),
-    }));
+    const result = await db
+      .select({
+        platform: releasesTracking.platform,
+        count: count(),
+      })
+      .from(releasesTracking)
+      .where(eq(releasesTracking.releaseId, releaseId))
+      .groupBy(releasesTracking.platform);
+
+    return result;
   }
 
   async getReleaseTrackingMetricsForAllReleases(): Promise<TrackingMetrics[]> {
-    const query = `
-      SELECT platform, COUNT(*) as count
-      FROM ${Tables.RELEASES_TRACKING}
-      GROUP BY platform
-    `;
-    const { rows } = await this.pool.query(query);
-    return rows.map((row) => ({
-      platform: row.platform,
-      count: Number(row.count),
-    }));
+    const result = await db
+      .select({
+        platform: releasesTracking.platform,
+        count: count(),
+      })
+      .from(releasesTracking)
+      .groupBy(releasesTracking.platform);
+
+    return result;
   }
 
-  async createRelease(release: Omit<Release, 'id'>): Promise<Release> {
-    const query = `
-      INSERT INTO ${Tables.RELEASES} (runtime_version, path, timestamp, commit_hash, commit_message, update_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, runtime_version as "runtimeVersion", path, timestamp, commit_hash as "commitHash", update_id as "updateId"
-    `;
-
-    const values = [
-      release.runtimeVersion,
-      release.path,
-      release.timestamp,
-      release.commitHash,
-      release.commitMessage,
-      release.updateId,
-    ];
-    const { rows } = await this.pool.query(query, values);
-    return rows[0];
+  async createRelease(
+    release: typeof releases.$inferInsert,
+  ): Promise<typeof releases.$inferSelect> {
+    const result = await db.insert(releases).values(release).returning();
+    return result[0];
   }
 
-  async getRelease(id: string): Promise<Release | null> {
-    const query = `
-      SELECT id, runtime_version as "runtimeVersion", path, timestamp, commit_hash as "commitHash", update_id as "updateId"
-      FROM ${Tables.RELEASES} WHERE id = $1
-    `;
-
-    const { rows } = await this.pool.query(query, [id]);
-    return rows[0] || null;
+  async getRelease(id: string): Promise<typeof releases.$inferSelect | null> {
+    const result = await db.select().from(releases).where(eq(releases.id, id)).limit(1);
+    return result[0] || null;
   }
 
-  async listReleases(): Promise<Release[]> {
-    const query = `
-      SELECT id, runtime_version as "runtimeVersion", path, timestamp, commit_hash as "commitHash", commit_message as "commitMessage", update_id as "updateId"
-      FROM ${Tables.RELEASES}
-      ORDER BY timestamp DESC
-    `;
-
-    const { rows } = await this.pool.query(query);
-    return rows;
+  async listReleases(): Promise<(typeof releases.$inferSelect)[]> {
+    const result = await db.select().from(releases).orderBy(desc(releases.timestamp));
+    return result;
   }
 }

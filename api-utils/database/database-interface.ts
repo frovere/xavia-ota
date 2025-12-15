@@ -1,19 +1,4 @@
-export interface Release {
-  id: string;
-  runtimeVersion: string;
-  path: string;
-  timestamp: string;
-  commitHash: string;
-  commitMessage: string;
-  updateId: string | null;
-}
-
-export interface Tracking {
-  id: string;
-  releaseId: string;
-  downloadTimestamp: string;
-  platform: string;
-}
+import { releases, releasesTracking } from '@/db/schema';
 
 export interface TrackingMetrics {
   platform: string;
@@ -21,12 +6,16 @@ export interface TrackingMetrics {
 }
 
 export interface DatabaseInterface {
-  createRelease(release: Omit<Release, 'id'>): Promise<Release>;
-  getRelease(id: string): Promise<Release | null>;
-  getReleaseByPath(path: string): Promise<Release | null>;
-  listReleases(): Promise<Release[]>;
-  createTracking(tracking: Omit<Tracking, 'id'>): Promise<Tracking>;
+  createRelease(release: typeof releases.$inferInsert): Promise<typeof releases.$inferSelect>;
+  getRelease(id: string): Promise<typeof releases.$inferSelect | null>;
+  getReleaseByPath(path: string): Promise<typeof releases.$inferSelect | null>;
+  listReleases(): Promise<(typeof releases.$inferSelect)[]>;
+  createTracking(
+    tracking: typeof releasesTracking.$inferInsert,
+  ): Promise<typeof releasesTracking.$inferSelect>;
   getReleaseTrackingMetrics(releaseId: string): Promise<TrackingMetrics[]>;
   getReleaseTrackingMetricsForAllReleases(): Promise<TrackingMetrics[]>;
-  getLatestReleaseRecordForRuntimeVersion(runtimeVersion: string): Promise<Release | null>;
+  getLatestReleaseRecordForRuntimeVersion(
+    runtimeVersion: string,
+  ): Promise<typeof releases.$inferSelect | null>;
 }

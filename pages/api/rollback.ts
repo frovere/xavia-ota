@@ -44,7 +44,7 @@ export default async function rollbackHandler(req: NextApiRequest, res: NextApiR
       timestamp: new UTCDate().toISOString(),
       commitHash,
       commitMessage,
-      updateId: oldRelease?.updateId ?? null,
+      updateId: oldRelease?.updateId,
     });
 
     res.status(200).json({ success: true, newPath });

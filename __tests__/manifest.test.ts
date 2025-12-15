@@ -8,7 +8,8 @@ import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { HashHelper } from '@/api-utils/helpers/hash-helper';
 import manifestEndpoint from '@/pages/api/manifest';
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { DatabaseInterface, Release } from '@/api-utils/database/database-interface';
+import { DatabaseInterface } from '@/api-utils/database/database-interface';
+import { releases } from '@/db/schema';
 
 jest.mock('../api-utils/helpers/update-helper');
 jest.mock('../api-utils/helpers/zip-helper');
@@ -56,7 +57,7 @@ describe('Manifest API', () => {
 
   it('should return NoUpdateAvailable when user is already running the latest release', async () => {
     // Mock database to return a release with matching updateId
-    const mockRelease: Release = {
+    const mockRelease: typeof releases.$inferSelect = {
       id: 'release-id',
       runtimeVersion: '1.0.0',
       path: 'path/to/update.zip',
@@ -75,7 +76,7 @@ describe('Manifest API', () => {
     // Mock NoUpdateAvailable directive
     const mockNoUpdateDirective = { type: 'noUpdateAvailable' };
     (UpdateHelper.createNoUpdateAvailableDirectiveAsync as jest.Mock).mockResolvedValue(
-      mockNoUpdateDirective
+      mockNoUpdateDirective,
     );
 
     // Mock FormData
@@ -103,13 +104,13 @@ describe('Manifest API', () => {
     expect(mockFormData.append).toHaveBeenCalledWith(
       'directive',
       JSON.stringify(mockNoUpdateDirective),
-      expect.any(Object)
+      expect.any(Object),
     );
   });
 
   it('should handle normal update successfully', async () => {
     // Mock database to return a release with different updateId
-    const mockRelease: Release = {
+    const mockRelease: typeof releases.$inferSelect = {
       id: 'release-id',
       runtimeVersion: '1.0.0',
       path: 'path/to/update.zip',
@@ -146,7 +147,7 @@ describe('Manifest API', () => {
 
     // Mock UpdateHelper methods
     (UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync as jest.Mock).mockResolvedValue(
-      'path/to/update'
+      'path/to/update',
     );
     (UpdateHelper.getMetadataAsync as jest.Mock).mockResolvedValue(mockMetadata);
     (UpdateHelper.getAssetMetadataAsync as jest.Mock).mockResolvedValue({
@@ -191,7 +192,7 @@ describe('Manifest API', () => {
     expect(mockFormData.append).toHaveBeenCalledWith(
       'manifest',
       expect.any(String),
-      expect.any(Object)
+      expect.any(Object),
     );
   });
 
@@ -205,7 +206,7 @@ describe('Manifest API', () => {
 
     // Mock UpdateHelper methods
     (UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync as jest.Mock).mockResolvedValue(
-      'path/to/update'
+      'path/to/update',
     );
     (UpdateHelper.createRollBackDirectiveAsync as jest.Mock).mockResolvedValue({
       type: 'rollBackToEmbedded',
@@ -246,7 +247,7 @@ describe('Manifest API', () => {
     expect(mockFormData.append).toHaveBeenCalledWith(
       'directive',
       expect.any(String),
-      expect.any(Object)
+      expect.any(Object),
     );
   });
 
@@ -260,7 +261,7 @@ describe('Manifest API', () => {
 
     // Mock UpdateHelper methods
     (UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync as jest.Mock).mockResolvedValue(
-      'path/to/update'
+      'path/to/update',
     );
 
     const mockMetadata = {
@@ -276,7 +277,7 @@ describe('Manifest API', () => {
     // Mock NoUpdateAvailable directive
     const mockNoUpdateDirective = { type: 'noUpdateAvailable' };
     (UpdateHelper.createNoUpdateAvailableDirectiveAsync as jest.Mock).mockResolvedValue(
-      mockNoUpdateDirective
+      mockNoUpdateDirective,
     );
 
     // Mock ZipHelper
@@ -319,13 +320,13 @@ describe('Manifest API', () => {
 
     // Mock UpdateHelper to throw NoUpdateAvailableError
     (UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync as jest.Mock).mockRejectedValue(
-      new NoUpdateAvailableError()
+      new NoUpdateAvailableError(),
     );
 
     // Mock NoUpdateAvailable directive
     const mockNoUpdateDirective = { type: 'noUpdateAvailable' };
     (UpdateHelper.createNoUpdateAvailableDirectiveAsync as jest.Mock).mockResolvedValue(
-      mockNoUpdateDirective
+      mockNoUpdateDirective,
     );
 
     // Mock FormData

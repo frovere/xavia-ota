@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-import { DatabaseInterface, Release, Tracking, TrackingMetrics } from './database-interface';
+import { releases, releasesTracking } from '@/db/schema';
+import { DatabaseInterface, TrackingMetrics } from './database-interface';
 import { Tables } from './database-factory';
 
 export class SupabaseDatabase implements DatabaseInterface {
@@ -17,7 +18,9 @@ export class SupabaseDatabase implements DatabaseInterface {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  async getLatestReleaseRecordForRuntimeVersion(runtimeVersion: string): Promise<Release | null> {
+  async getLatestReleaseRecordForRuntimeVersion(
+    runtimeVersion: string,
+  ): Promise<typeof releases.$inferSelect | null> {
     const { data, error } = await this.supabase
       .from(Tables.RELEASES)
       .select()
@@ -43,7 +46,7 @@ export class SupabaseDatabase implements DatabaseInterface {
     return null;
   }
 
-  async getReleaseByPath(path: string): Promise<Release | null> {
+  async getReleaseByPath(path: string): Promise<typeof releases.$inferSelect | null> {
     const { data, error } = await this.supabase
       .from(Tables.RELEASES)
       .select()
@@ -90,7 +93,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       },
     ];
   }
-  async createTracking(tracking: Omit<Tracking, 'id'>): Promise<Tracking> {
+  async createTracking(
+    tracking: typeof releasesTracking.$inferInsert,
+  ): Promise<typeof releasesTracking.$inferSelect> {
     const { data, error } = await this.supabase
       .from(Tables.RELEASES_TRACKING)
       .insert({
@@ -131,7 +136,9 @@ export class SupabaseDatabase implements DatabaseInterface {
     ];
   }
 
-  async createRelease(release: Omit<Release, 'id'>): Promise<Release> {
+  async createRelease(
+    release: typeof releases.$inferInsert,
+  ): Promise<typeof releases.$inferSelect> {
     const { data, error } = await this.supabase
       .from(Tables.RELEASES)
       .insert({
@@ -149,7 +156,7 @@ export class SupabaseDatabase implements DatabaseInterface {
     return data;
   }
 
-  async getRelease(id: string): Promise<Release | null> {
+  async getRelease(id: string): Promise<typeof releases.$inferSelect | null> {
     const { data, error } = await this.supabase
       .from(Tables.RELEASES)
       .select()
@@ -173,7 +180,7 @@ export class SupabaseDatabase implements DatabaseInterface {
     return null;
   }
 
-  async listReleases(): Promise<Release[]> {
+  async listReleases(): Promise<(typeof releases.$inferSelect)[]> {
     const { data, error } = await this.supabase
       .from(Tables.RELEASES)
       .select()
