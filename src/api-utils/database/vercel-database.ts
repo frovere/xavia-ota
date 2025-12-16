@@ -1,8 +1,8 @@
+import { sql } from '@vercel/postgres';
 import { count, desc, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
-import { sql } from '@vercel/postgres';
 
-const db = drizzle({ client: sql })
+const db = drizzle({ client: sql });
 
 import { releases, releasesTracking } from '@/db/schema';
 import { DatabaseInterface, TrackingMetrics } from './database-interface';
