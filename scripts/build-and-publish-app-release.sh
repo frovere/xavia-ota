@@ -43,7 +43,7 @@ jq '.expo' app.json > $outputFolder/expoconfig.json
 
 
 # Zip the output folder
-cd $outputFolder  
+cd $outputFolder
 zip -q -r ${timestamp}.zip .
 
 

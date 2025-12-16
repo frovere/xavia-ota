@@ -6,11 +6,14 @@ import {
   queryOptions,
   useSuspenseQuery,
 } from '@tanstack/react-query';
+import { LucidePackage, LucideDownload, LucideApple, LucideBot } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import Layout from '@/components/layout';
-import LoadingSpinner from '@/components/loading-spinner';
 import ProtectedRoute from '@/components/protected-route';
+import DashboardCharts, { DashboardChartsSkeleton } from '@/components/dashboard-charts';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { AllTrackingResponse } from './api/tracking/all';
 
 const baseUrl = isServer ? (process.env.HOST ?? 'http://localhost:3000') : '';
@@ -41,6 +44,79 @@ export async function getServerSideProps() {
   };
 }
 
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  backgroundColor,
+  badge,
+}: {
+  title: string;
+  value: number | string;
+  icon: React.ComponentType<{ className?: string }>;
+  backgroundColor: string;
+  badge?: string;
+}) {
+  return (
+    <Card className={`${backgroundColor} text-white relative overflow-hidden`}>
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white/80">{title}</p>
+            <p className="text-3xl font-bold mt-2">{value}</p>
+          </div>
+          <Icon className="w-8 h-8 text-white/60" />
+        </div>
+        {badge && (
+          <Badge className="absolute top-4 right-4 bg-white/20 text-white hover:bg-white/30">
+            {badge}
+          </Badge>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function TimePeriodCard({
+  title,
+  total,
+  ios,
+  android,
+}: {
+  title: string;
+  total: number;
+  ios: number;
+  android: number;
+}) {
+  return (
+    <Card className="border">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <LucideDownload className="w-4 h-4" />
+          <h3 className="font-semibold">{title}</h3>
+        </div>
+        <p className="text-3xl font-bold mb-4">{total}</p>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <LucideApple className="w-4 h-4" />
+              <span>iOS</span>
+            </div>
+            <span>{ios}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <LucideBot className="w-4 h-4" />
+              <span>Android</span>
+            </div>
+            <span>{android}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function DashboardData() {
   const { data } = useSuspenseQuery(queryOpts);
   const { totalDownloaded, iosDownloads, androidDownloads } = data.trackings.reduce(
@@ -54,43 +130,90 @@ function DashboardData() {
   );
 
   return (
-    <div className="grid grid-cols-2 gap-4 mt-4">
-      <Card className="bg-primary text-primary-foreground">
-        <CardHeader className="text-center">
-          <CardTitle>Total Releases</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p className="text-2xl font-bold">{data.totalReleases}</p>
-        </CardContent>
-      </Card>
+    <>
+      <div className="grid grid-cols-4 gap-4">
+        <StatCard
+          title="Total Releases"
+          value={data.totalReleases}
+          icon={LucidePackage}
+          backgroundColor="bg-primary"
+        />
+        <StatCard
+          title="All Time"
+          value={totalDownloaded}
+          icon={LucideDownload}
+          backgroundColor="bg-purple-700"
+        />
+        <StatCard
+          title="iOS Downloads"
+          value={iosDownloads}
+          icon={LucideApple}
+          backgroundColor="bg-ios-blue"
+          badge="iOS"
+        />
+        <StatCard
+          title="Android Downloads"
+          value={androidDownloads}
+          icon={LucideBot}
+          backgroundColor="bg-android-green"
+          badge="AND"
+        />
+      </div>
 
-      <Card className="bg-primary text-primary-foreground">
-        <CardHeader className="text-center">
-          <CardTitle>Total Downloads</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p className="text-2xl font-bold">{totalDownloaded}</p>
-        </CardContent>
-      </Card>
+      {/* Time Period Cards - 3 Cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <TimePeriodCard title="Today" total={9} ios={3} android={6} />
+        <TimePeriodCard title="This Week" total={33} ios={12} android={21} />
+        <TimePeriodCard title="This Month" total={200} ios={68} android={132} />
+      </div>
 
-      <Card className="bg-primary text-primary-foreground">
-        <CardHeader className="text-center">
-          <CardTitle>iOS Downloads</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p className="text-2xl font-bold">{iosDownloads}</p>
-        </CardContent>
-      </Card>
+      <DashboardCharts iosDownloads={iosDownloads} androidDownloads={androidDownloads} />
+    </>
+  );
+}
 
-      <Card className="bg-primary text-primary-foreground">
-        <CardHeader className="text-center">
-          <CardTitle>Android Downloads</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p className="text-2xl font-bold">{androidDownloads}</p>
-        </CardContent>
-      </Card>
-    </div>
+function StatCardSkeleton() {
+  return (
+    <Card className="bg-secondary text-white relative overflow-hidden">
+      <CardContent className="p-6">
+        <Skeleton className="w-full h-4 mb-2" />
+        <Skeleton className="w-full h-4 mb-2" />
+        <Skeleton className="w-full h-4 mb-2" />
+      </CardContent>
+    </Card>
+  );
+}
+
+function TimePeriodCardSkeleton() {
+  return (
+    <Card className="bg-secondary text-white relative overflow-hidden">
+      <CardContent className="p-6">
+        <Skeleton className="w-full h-4 mb-2" />
+        <Skeleton className="w-full h-4 mb-2" />
+        <Skeleton className="w-full h-4 mb-2" />
+      </CardContent>
+    </Card>
+  );
+}
+
+function DataSkeleton() {
+  return (
+    <>
+      <div className="grid grid-cols-4 gap-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <TimePeriodCardSkeleton />
+        <TimePeriodCardSkeleton />
+        <TimePeriodCardSkeleton />
+      </div>
+
+      <DashboardChartsSkeleton />
+    </>
   );
 }
 
@@ -98,9 +221,15 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <Layout>
-        <Suspense fallback={<LoadingSpinner size="lg" />}>
-          <DashboardData />
-        </Suspense>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">Application download statistics</p>
+          </div>
+          <Suspense fallback={<DataSkeleton />}>
+            <DashboardData />
+          </Suspense>
+        </div>
       </Layout>
     </ProtectedRoute>
   );
