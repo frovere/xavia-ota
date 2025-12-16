@@ -7,8 +7,10 @@
     "next:dev": "bun --bun next dev --turbopack",
     "build": "bun --bun next build --turbopack",
     "start": "bun --bun next start",
-    "lint": "eslint api-utils pages",
+    "lint": "eslint src",
+    "lint:biome": "biome check src",
     "test": "jest",
+    "test:watch": "jest --watch",
     "prepare": "husky",
     "release": "bash ./scripts/release.sh",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
