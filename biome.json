@@ -1,7 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.3.9/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": { "ignoreUnknown": false },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
+  },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
@@ -54,7 +61,10 @@
         "useParseIntRadix": "warn",
         "useValidTypeof": "error"
       },
-      "security": { "noGlobalEval": "warn" },
+      "security": {
+        "noGlobalEval": "warn",
+        "noDangerouslySetInnerHtml": "warn"
+       },
       "style": {
         "noYodaExpression": "warn",
         "useArrayLiterals": "warn",
@@ -77,6 +87,7 @@
         "noFallthroughSwitchClause": "warn",
         "noFunctionAssign": "error",
         "noGlobalAssign": "warn",
+        "noArrayIndexKey": "warn",
         "noIrregularWhitespace": "warn",
         "noLabelVar": "warn",
         "noOctalEscape": "warn",
@@ -85,10 +96,15 @@
         "noShadowRestrictedNames": "warn",
         "noSparseArray": "warn",
         "noUnsafeNegation": "warn",
+        "noUnknownAtRules": "off",
         "noVar": "warn",
         "noWith": "warn",
         "useGetterReturn": "warn"
       }
+    },
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
     }
   },
   "javascript": {
@@ -102,260 +118,12 @@
       "quoteStyle": "single",
       "attributePosition": "auto",
       "bracketSpacing": true
-    },
-    "globals": [
-      "onanimationend",
-      "exports",
-      "ongamepadconnected",
-      "onlostpointercapture",
-      "onanimationiteration",
-      "onkeyup",
-      "onmousedown",
-      "onanimationstart",
-      "onslotchange",
-      "onprogress",
-      "ontransitionstart",
-      "onpause",
-      "onended",
-      "onpointerover",
-      "onscrollend",
-      "onformdata",
-      "ontransitionrun",
-      "onanimationcancel",
-      "ondrag",
-      "onchange",
-      "onbeforeinstallprompt",
-      "onbeforexrselect",
-      "onmessage",
-      "ontransitioncancel",
-      "onpointerdown",
-      "onabort",
-      "onpointerout",
-      "oncuechange",
-      "ongotpointercapture",
-      "onscrollsnapchanging",
-      "onsearch",
-      "onsubmit",
-      "onstalled",
-      "onsuspend",
-      "onreset",
-      "onerror",
-      "onmouseenter",
-      "ongamepaddisconnected",
-      "onresize",
-      "ondragover",
-      "onbeforetoggle",
-      "onmouseover",
-      "onpagehide",
-      "onmousemove",
-      "onratechange",
-      "oncommand",
-      "onmessageerror",
-      "onwheel",
-      "ondevicemotion",
-      "onauxclick",
-      "ontransitionend",
-      "onpaste",
-      "onpageswap",
-      "ononline",
-      "ondeviceorientationabsolute",
-      "onkeydown",
-      "onclose",
-      "onselect",
-      "onpageshow",
-      "onpointercancel",
-      "onbeforematch",
-      "onpointerrawupdate",
-      "ondragleave",
-      "onscrollsnapchange",
-      "onseeked",
-      "onwaiting",
-      "onbeforeunload",
-      "onplaying",
-      "onvolumechange",
-      "ondragend",
-      "onstorage",
-      "onloadeddata",
-      "onfocus",
-      "onoffline",
-      "onplay",
-      "onafterprint",
-      "onclick",
-      "oncut",
-      "onmouseout",
-      "ondblclick",
-      "oncanplay",
-      "onloadstart",
-      "onappinstalled",
-      "onpointermove",
-      "ontoggle",
-      "oncontextmenu",
-      "onblur",
-      "oncancel",
-      "onbeforeprint",
-      "oncontextrestored",
-      "onloadedmetadata",
-      "onpointerup",
-      "onlanguagechange",
-      "oncopy",
-      "onselectstart",
-      "onscroll",
-      "onload",
-      "ondragstart",
-      "onbeforeinput",
-      "oncanplaythrough",
-      "oninput",
-      "oninvalid",
-      "ontimeupdate",
-      "ondurationchange",
-      "onselectionchange",
-      "onmouseup",
-      "location",
-      "onkeypress",
-      "onpointerleave",
-      "oncontextlost",
-      "ondrop",
-      "onsecuritypolicyviolation",
-      "oncontentvisibilityautostatechange",
-      "ondeviceorientation",
-      "onseeking",
-      "onrejectionhandled",
-      "onunload",
-      "onmouseleave",
-      "onhashchange",
-      "onpointerenter",
-      "onmousewheel",
-      "onunhandledrejection",
-      "ondragenter",
-      "onpopstate",
-      "onpagereveal",
-      "onemptied",
-      "jest"
-    ]
+    }
   },
-  "html": { "formatter": { "indentScriptAndStyle": false, "selfCloseVoidElements": "always" } },
   "css": {
     "parser": {
       "tailwindDirectives": true
     }
   },
-  "overrides": [
-    { "includes": ["**/*.d.ts"], "linter": { "rules": {} } },
-    { "includes": ["**/*.js", "**/*.jsx"] },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": { "rules": {} }
-    },
-    { "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"], "linter": { "rules": {} } },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": {
-        "rules": {
-          "complexity": { "noUselessConstructor": "warn" },
-          "correctness": { "noUndeclaredVariables": "off", "noUnusedVariables": "warn" },
-          "style": {
-            "useConsistentArrayType": { "level": "warn", "options": { "syntax": "shorthand" } }
-          },
-          "suspicious": {
-            "noDuplicateClassMembers": "warn",
-            "noExtraNonNullAssertion": "warn",
-            "noRedeclare": "warn"
-          }
-        }
-      }
-    },
-    { "includes": ["**/*.d.ts"], "linter": { "rules": {} } },
-    { "includes": ["**/*.js", "**/*.jsx"] },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": { "rules": {} }
-    },
-    { "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"], "linter": { "rules": {} } },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": {
-        "rules": {
-          "complexity": { "noUselessConstructor": "warn" },
-          "correctness": { "noUndeclaredVariables": "off", "noUnusedVariables": "warn" },
-          "style": {
-            "useConsistentArrayType": { "level": "warn", "options": { "syntax": "shorthand" } }
-          },
-          "suspicious": {
-            "noDuplicateClassMembers": "warn",
-            "noExtraNonNullAssertion": "warn",
-            "noRedeclare": "warn"
-          }
-        }
-      }
-    },
-    { "includes": ["**/*.js", "**/*.jsx"] },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": { "rules": {} }
-    },
-    { "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"], "linter": { "rules": {} } },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": {
-        "rules": {
-          "complexity": { "noUselessConstructor": "warn" },
-          "correctness": { "noUndeclaredVariables": "off", "noUnusedVariables": "warn" },
-          "style": {
-            "useConsistentArrayType": { "level": "warn", "options": { "syntax": "shorthand" } }
-          },
-          "suspicious": {
-            "noDuplicateClassMembers": "warn",
-            "noExtraNonNullAssertion": "warn",
-            "noRedeclare": "warn"
-          }
-        }
-      }
-    },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "linter": {
-        "rules": {
-          "complexity": { "useOptionalChain": "warn" },
-          "style": { "useAsConstAssertion": "warn", "useReadonlyClassProperties": "warn" },
-          "suspicious": { "noExtraNonNullAssertion": "warn" }
-        }
-      }
-    },
-    {
-      "includes": ["**/*.{js,jsx,ts,tsx}"],
-      "linter": {
-        "rules": {
-          "performance": {
-            "noImgElement": "warn",
-            "noUnwantedPolyfillio": "warn",
-            "useGoogleFontPreconnect": "warn"
-          },
-          "style": { "noHeadElement": "warn" },
-          "suspicious": {
-            "noDocumentImportInPage": "error",
-            "noHeadImportInDocument": "error",
-            "useGoogleFontDisplay": "warn"
-          }
-        }
-      }
-    },
-    {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-      "javascript": { "globals": [] },
-      "linter": {
-        "rules": {
-          "complexity": { "noVoid": "warn" },
-          "correctness": { "noUndeclaredVariables": "off", "noUnusedVariables": "error" },
-          "suspicious": { "noRedeclare": "off" }
-        }
-      }
-    }
-  ],
   "assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } }
 }
