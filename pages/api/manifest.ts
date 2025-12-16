@@ -1,16 +1,15 @@
+import { UTCDate } from '@date-fns/utc';
 import FormData from 'form-data';
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { serializeDictionary } from 'structured-headers';
 
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { ConfigHelper } from '@/api-utils/helpers/config-helper';
 import { DictionaryHelper } from '@/api-utils/helpers/dictionary-helper';
 import { HashHelper } from '@/api-utils/helpers/hash-helper';
-import { UpdateHelper, NoUpdateAvailableError } from '@/api-utils/helpers/update-helper';
+import { NoUpdateAvailableError, UpdateHelper } from '@/api-utils/helpers/update-helper';
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { getLogger } from '@/api-utils/logger';
-import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { UTCDate } from '@date-fns/utc';
 
 const logger = getLogger('manifest');
 
@@ -40,7 +39,7 @@ export default async function manifestEndpoint(req: NextApiRequest, res: NextApi
 
   const protocolVersion = parseInt(protocolVersionMaybeArray ?? '0', 10);
 
-  const platform = req.headers['expo-platform'] ?? req.query['platform'];
+  const platform = req.headers['expo-platform'] ?? req.query.platform;
   if (platform !== 'ios' && platform !== 'android') {
     res.statusCode = 400;
     res.json({

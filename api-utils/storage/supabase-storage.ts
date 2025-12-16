@@ -23,27 +23,35 @@ export class SupabaseStorage implements StorageInterface {
       .from(this.bucketName)
       .copy(sourcePath, destinationPath);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
   }
 
   async listDirectories(directory: string): Promise<string[]> {
     const { data, error } = await this.supabase.storage.from(this.bucketName).list(directory);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return data.map((file) => file.name);
   }
 
   async uploadFile(path: string, file: Buffer): Promise<string> {
     const { error } = await this.supabase.storage.from(this.bucketName).upload(path, file);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return path;
   }
 
   async downloadFile(path: string): Promise<Buffer> {
     const { data, error } = await this.supabase.storage.from(this.bucketName).download(path);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return Buffer.from(await data.arrayBuffer());
   }
 
@@ -52,7 +60,9 @@ export class SupabaseStorage implements StorageInterface {
       .from(this.bucketName)
       .list(path.split('/').slice(0, -1).join('/'));
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return data.some((file) => file.name === path.split('/').pop());
   }
 
@@ -66,7 +76,9 @@ export class SupabaseStorage implements StorageInterface {
   > {
     const { data, error } = await this.supabase.storage.from(this.bucketName).list(directory);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return data.map((file) => ({
       name: file.name,
       updated_at: file.updated_at,

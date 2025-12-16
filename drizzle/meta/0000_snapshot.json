@@ -98,12 +98,8 @@
           "tableFrom": "releases_tracking",
           "tableTo": "releases",
           "schemaTo": "public",
-          "columnsFrom": [
-            "release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["release_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -112,12 +108,8 @@
           "tableFrom": "releases_tracking",
           "tableTo": "releases",
           "schemaTo": "public",
-          "columnsFrom": [
-            "release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["release_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

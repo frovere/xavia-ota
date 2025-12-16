@@ -1,8 +1,4 @@
-import { format } from 'date-fns';
 import { UTCDate } from '@date-fns/utc';
-import { Suspense } from 'react';
-import { LucideRefreshCw } from 'lucide-react';
-import { ErrorBoundary } from 'react-error-boundary';
 import {
   dehydrate,
   isServer,
@@ -12,7 +8,14 @@ import {
   useQuery,
   useSuspenseQuery,
 } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { LucideRefreshCw } from 'lucide-react';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
+import Layout from '@/components/layout';
+import ProtectedRoute from '@/components/protected-route';
+import { showToast } from '@/components/toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,9 +38,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import Layout from '@/components/layout';
-import ProtectedRoute from '@/components/protected-route';
-import { showToast } from '@/components/toast';
 
 interface Release {
   path: string;
@@ -134,9 +134,7 @@ function ReleasesData() {
                 <TableCell>{release.runtimeVersion}</TableCell>
                 <TableCell>
                   <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="block w-40 truncate">{release.commitHash}</span>
-                    </TooltipTrigger>
+                    <TooltipTrigger>{release.commitHash?.slice(0, 7)}</TooltipTrigger>
                     <TooltipContent>
                       <p>{release.commitHash}</p>
                     </TooltipContent>
@@ -230,7 +228,9 @@ export default function ReleasesPage() {
 }
 
 function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) {
+    return '0 Bytes';
+  }
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));

@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useRouter } from 'next/router';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
+import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,10 +14,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { toast } from 'sonner';
 
 async function login({ password }: { password: string }) {
   const response = await fetch('/api/login', {

@@ -1,7 +1,7 @@
-import { AppProps } from 'next/app';
-import { ThemeProvider } from 'next-themes';
 import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { AppProps } from 'next/app';
+import { ThemeProvider } from 'next-themes';
 import { useState } from 'react';
 
 import { Toaster } from '@/components/ui/sonner';

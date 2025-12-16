@@ -1,12 +1,12 @@
-import formidable from 'formidable';
-import { createMocks } from 'node-mocks-http';
-import fs from 'fs';
 import AdmZip from 'adm-zip';
+import formidable from 'formidable';
+import fs from 'fs';
+import { createMocks } from 'node-mocks-http';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { StorageFactory } from '@/api-utils/storage/storage-factory';
-import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { HashHelper } from '@/api-utils/helpers/hash-helper';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
+import { StorageFactory } from '@/api-utils/storage/storage-factory';
 import uploadHandler from '@/pages/api/upload';
 
 jest.mock('../api-utils/database/database-factory');
@@ -73,7 +73,10 @@ describe('Upload API', () => {
     (DatabaseFactory.getDatabase as jest.Mock).mockReturnValue(mockDatabase);
 
     // Execute test
-    const { req, res } = createMocks({ method: 'POST', headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` } });
+    const { req, res } = createMocks({
+      method: 'POST',
+      headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` },
+    });
     await uploadHandler(req, res);
 
     // Verify results
@@ -102,7 +105,10 @@ describe('Upload API', () => {
 
     (formidable as unknown as jest.Mock).mockReturnValue(mockForm);
 
-    const { req, res } = createMocks({ method: 'POST', headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` } });
+    const { req, res } = createMocks({
+      method: 'POST',
+      headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` },
+    });
     await uploadHandler(req, res);
 
     expect(res._getStatusCode()).toBe(400);

@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { getLogger } from '@/api-utils/logger';
 import { TrackingMetrics } from '@/api-utils/database/database-interface';
+import { getLogger } from '@/api-utils/logger';
 
 const logger = getLogger('allTrackingHandler');
 

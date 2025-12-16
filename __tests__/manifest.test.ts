@@ -1,15 +1,15 @@
 import AdmZip from 'adm-zip';
-import { createMocks } from 'node-mocks-http';
 import FormData from 'form-data';
+import { createMocks } from 'node-mocks-http';
 
-import { ConfigHelper } from '@/api-utils/helpers/config-helper';
-import { UpdateHelper, NoUpdateAvailableError } from '@/api-utils/helpers/update-helper';
-import { ZipHelper } from '@/api-utils/helpers/zip-helper';
-import { HashHelper } from '@/api-utils/helpers/hash-helper';
-import manifestEndpoint from '@/pages/api/manifest';
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { DatabaseInterface } from '@/api-utils/database/database-interface';
+import { ConfigHelper } from '@/api-utils/helpers/config-helper';
+import { HashHelper } from '@/api-utils/helpers/hash-helper';
+import { NoUpdateAvailableError, UpdateHelper } from '@/api-utils/helpers/update-helper';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { releases } from '@/db/schema';
+import manifestEndpoint from '@/pages/api/manifest';
 
 jest.mock('../api-utils/helpers/update-helper');
 jest.mock('../api-utils/helpers/zip-helper');

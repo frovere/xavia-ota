@@ -1,11 +1,12 @@
 import {
-  S3Client,
+  CopyObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
-  CopyObjectCommand,
+  S3Client,
 } from '@aws-sdk/client-s3';
+
 import { StorageInterface } from './storage-interface';
 
 export class S3Storage implements StorageInterface {
@@ -33,7 +34,9 @@ export class S3Storage implements StorageInterface {
   }
 
   private normalizeKey(input: string): string {
-    if (!input) return '';
+    if (!input) {
+      return '';
+    }
     let k = input.replace(/\\/g, '/');
     k = k.trim();
     k = k.replace(/^\/+/g, '');
@@ -42,7 +45,9 @@ export class S3Storage implements StorageInterface {
   }
 
   private normalizeRoot(root?: string): string {
-    if (!root) return '';
+    if (!root) {
+      return '';
+    }
     let r = this.normalizeKey(root);
     r = r.replace(/\/+$/g, '');
     r = r.replace(/\s+/g, '');
@@ -51,8 +56,12 @@ export class S3Storage implements StorageInterface {
 
   private withRootKey(path: string): string {
     const normalizedPath = this.normalizeKey(path);
-    if (!this.rootDirectory) return normalizedPath;
-    if (!normalizedPath) return this.rootDirectory;
+    if (!this.rootDirectory) {
+      return normalizedPath;
+    }
+    if (!normalizedPath) {
+      return this.rootDirectory;
+    }
     return `${this.rootDirectory}/${normalizedPath}`;
   }
 
@@ -85,7 +94,9 @@ export class S3Storage implements StorageInterface {
   async fileExists(path: string): Promise<boolean> {
     const normalizedPath = this.normalizeKey(path);
     const key = this.withRootKey(normalizedPath);
-    if (!key) return false;
+    if (!key) {
+      return false;
+    }
     try {
       const headCommand = new HeadObjectCommand({
         Bucket: this.bucketName,

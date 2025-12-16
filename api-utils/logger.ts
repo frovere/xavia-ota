@@ -1,5 +1,5 @@
-import { format } from 'date-fns';
 import { UTCDate } from '@date-fns/utc';
+import { format } from 'date-fns';
 import winston from 'winston';
 
 const { combine, printf, colorize, align, errors, metadata } = winston.format;

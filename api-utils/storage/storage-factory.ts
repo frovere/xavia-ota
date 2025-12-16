@@ -1,9 +1,9 @@
+import { getLogger } from '@/api-utils/logger';
+import { GCSStorage } from './gcs-storage';
 import { LocalStorage } from './local-storage';
+import { S3Storage } from './s3-storage';
 import { StorageInterface } from './storage-interface';
 import { SupabaseStorage } from './supabase-storage';
-import { GCSStorage } from './gcs-storage';
-import { S3Storage } from './s3-storage';
-import { getLogger } from '@/api-utils/logger';
 
 const logger = getLogger('StorageFactory');
 

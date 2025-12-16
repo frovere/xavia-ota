@@ -1,10 +1,9 @@
-import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { LucideLayoutDashboard, LucideLogOut, LucideTags } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

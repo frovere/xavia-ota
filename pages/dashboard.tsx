@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import {
   dehydrate,
   isServer,
@@ -6,13 +5,14 @@ import {
   queryOptions,
   useSuspenseQuery,
 } from '@tanstack/react-query';
-import { LucidePackage, LucideDownload, LucideApple, LucideBot } from 'lucide-react';
+import { LucideApple, LucideBot, LucideDownload, LucidePackage } from 'lucide-react';
+import { Suspense } from 'react';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import DashboardCharts, { DashboardChartsSkeleton } from '@/components/dashboard-charts';
 import Layout from '@/components/layout';
 import ProtectedRoute from '@/components/protected-route';
-import DashboardCharts, { DashboardChartsSkeleton } from '@/components/dashboard-charts';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { AllTrackingResponse } from './api/tracking/all';
 

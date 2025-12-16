@@ -1,14 +1,14 @@
+import { UTCDate } from '@date-fns/utc';
+import AdmZip from 'adm-zip';
+import { format } from 'date-fns';
 import formidable from 'formidable';
 import fs from 'fs';
-import { format } from 'date-fns';
-import { UTCDate } from '@date-fns/utc';
 import { NextApiRequest, NextApiResponse } from 'next';
-import AdmZip from 'adm-zip';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { StorageFactory } from '@/api-utils/storage/storage-factory';
-import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { HashHelper } from '@/api-utils/helpers/hash-helper';
+import { ZipHelper } from '@/api-utils/helpers/zip-helper';
+import { StorageFactory } from '@/api-utils/storage/storage-factory';
 
 export const config = {
   api: {

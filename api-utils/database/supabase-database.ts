@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 import { releases, releasesTracking } from '@/db/schema';
-import { DatabaseInterface, TrackingMetrics } from './database-interface';
 import { Tables } from './database-factory';
+import { DatabaseInterface, TrackingMetrics } from './database-interface';
 
 export class SupabaseDatabase implements DatabaseInterface {
   private readonly supabase;
@@ -29,7 +29,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .limit(1)
       .maybeSingle();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw new Error(error.message);
+    }
 
     if (data) {
       return {
@@ -53,7 +55,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .eq('path', path)
       .maybeSingle();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw new Error(error.message);
+    }
 
     if (data) {
       return {
@@ -81,7 +85,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .select('platform', { count: 'estimated', head: true })
       .eq('platform', 'android');
 
-    if (iosError || androidError) throw new Error(iosError?.message || androidError?.message);
+    if (iosError || androidError) {
+      throw new Error(iosError?.message || androidError?.message);
+    }
     return [
       {
         platform: 'ios',
@@ -106,7 +112,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .select()
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw new Error(error.message);
+    }
     return data;
   }
   async getReleaseTrackingMetrics(releaseId: string): Promise<TrackingMetrics[]> {
@@ -122,7 +130,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .eq('release_id', releaseId)
       .eq('platform', 'android');
 
-    if (iosError || androidError) throw new Error(iosError?.message || androidError?.message);
+    if (iosError || androidError) {
+      throw new Error(iosError?.message || androidError?.message);
+    }
 
     return [
       {
@@ -152,7 +162,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return data;
   }
 
@@ -163,7 +175,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .eq('id', id)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
     if (data) {
       return {
@@ -186,7 +200,9 @@ export class SupabaseDatabase implements DatabaseInterface {
       .select()
       .order('timestamp', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
     return data.map((release) => ({
       id: release.id,
       path: release.path,
