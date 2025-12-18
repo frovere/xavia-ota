@@ -1,25 +1,25 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Upload API should handle file upload successfully 1`] = `
+exports[`Upload API > should handle file upload successfully 1`] = `
 {
   "path": "updates/1.0.0/timestamp.zip",
   "success": true,
 }
 `;
 
-exports[`Upload API should return 400 for missing required fields 1`] = `
+exports[`Upload API > should return 400 for missing required fields 1`] = `
 {
   "error": "Missing file, runtime version, or commit hash",
 }
 `;
 
-exports[`Upload API should return 401 for missing bearer token 1`] = `
+exports[`Upload API > should return 401 for missing bearer token 1`] = `
 {
   "error": "Unauthorized: wrong upload key",
 }
 `;
 
-exports[`Upload API should return 405 for non-POST requests 1`] = `
+exports[`Upload API > should return 405 for non-POST requests 1`] = `
 {
   "error": "Method not allowed",
 }

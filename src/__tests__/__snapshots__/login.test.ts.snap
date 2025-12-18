@@ -1,24 +1,24 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Login API should return 200 for correct password 1`] = `
+exports[`Login API > should return 200 for correct password 1`] = `
 {
   "success": true,
 }
 `;
 
-exports[`Login API should return 401 for invalid password 1`] = `
+exports[`Login API > should return 401 for invalid password 1`] = `
 {
   "error": "Invalid password",
 }
 `;
 
-exports[`Login API should return 405 for non-POST requests 1`] = `
+exports[`Login API > should return 405 for non-POST requests 1`] = `
 {
   "error": "Method not allowed",
 }
 `;
 
-exports[`Login API should return 500 if admin password is not configured 1`] = `
+exports[`Login API > should return 500 if admin password is not configured 1`] = `
 {
   "error": "Admin password not configured",
 }

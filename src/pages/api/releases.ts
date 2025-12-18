@@ -14,15 +14,13 @@ export default async function releasesHandler(req: NextApiRequest, res: NextApiR
     return;
   }
 
-  if (process.env.NODE_ENV !== 'test') {
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(req.headers),
-    });
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-    if (!session) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
+  if (!session) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
   }
 
   try {

@@ -1,15 +1,16 @@
 import { createMocks } from 'node-mocks-http';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { UpdateHelper } from '@/api-utils/helpers/update-helper';
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import assetsEndpoint from '@/pages/api/assets';
 
-jest.mock('../api-utils/helpers/update-helper');
-jest.mock('../api-utils/helpers/zip-helper');
+vi.mock('../api-utils/helpers/update-helper');
+vi.mock('../api-utils/helpers/zip-helper');
 
 describe('Assets API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return 400 if asset path is missing', async () => {
@@ -51,12 +52,12 @@ describe('Assets API', () => {
       },
     };
 
-    (UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync as jest.Mock).mockResolvedValue(
+    (UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync as Mock).mockResolvedValue(
       'path/to/update',
     );
-    (UpdateHelper.getMetadataAsync as jest.Mock).mockResolvedValue(mockMetadata);
-    (ZipHelper.getZipFromStorage as jest.Mock).mockResolvedValue({});
-    (ZipHelper.getFileFromZip as jest.Mock).mockResolvedValue(Buffer.from('test'));
+    (UpdateHelper.getMetadataAsync as Mock).mockResolvedValue(mockMetadata);
+    (ZipHelper.getZipFromStorage as Mock).mockResolvedValue({});
+    (ZipHelper.getFileFromZip as Mock).mockResolvedValue(Buffer.from('test'));
 
     const { req, res } = createMocks({
       method: 'GET',

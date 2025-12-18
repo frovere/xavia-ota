@@ -1,4 +1,5 @@
 import { createMocks } from 'node-mocks-http';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import loginEndpoint from '@/pages/api/login';
 
@@ -6,7 +7,7 @@ describe('Login API', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = { ...originalEnv };
   });
 
