@@ -20,13 +20,16 @@ export default async function manifestEndpoint(req: NextApiRequest, res: NextApi
     return;
   }
 
-  logger.info('A client requested a release', {
-    runtimeVersion: req.headers['expo-runtime-version'],
-    platform: req.headers['expo-platform'],
-    protocolVersion: req.headers['expo-protocol-version'],
-    apiVersion: req.headers['expo-api-version'],
-    currentUpdateId: req.headers['expo-current-update-id'],
-  });
+  logger.info(
+    {
+      runtimeVersion: req.headers['expo-runtime-version'],
+      platform: req.headers['expo-platform'],
+      protocolVersion: req.headers['expo-protocol-version'],
+      apiVersion: req.headers['expo-api-version'],
+      currentUpdateId: req.headers['expo-current-update-id'],
+    },
+    'A client requested a release.',
+  );
 
   const protocolVersionMaybeArray = req.headers['expo-protocol-version'];
   if (protocolVersionMaybeArray && Array.isArray(protocolVersionMaybeArray)) {
@@ -65,9 +68,12 @@ export default async function manifestEndpoint(req: NextApiRequest, res: NextApi
 
     const currentUpdateId = req.headers['expo-current-update-id'];
     if (currentUpdateId === updateId) {
-      logger.info('User is already running the latest release. Returning NoUpdateAvailable.', {
-        runtimeVersion,
-      });
+      logger.info(
+        {
+          runtimeVersion,
+        },
+        'User is already running the latest release. Returning NoUpdateAvailable.',
+      );
       await putNoUpdateAvailableInResponseAsync(req, res, protocolVersion);
       return;
     }
@@ -79,7 +85,12 @@ export default async function manifestEndpoint(req: NextApiRequest, res: NextApi
       await UpdateHelper.getLatestUpdateBundlePathForRuntimeVersionAsync(runtimeVersion);
   } catch (error: any) {
     if (error instanceof NoUpdateAvailableError) {
-      logger.info('No update available for runtime version', { runtimeVersion });
+      logger.info(
+        {
+          runtimeVersion,
+        },
+        'No update available for runtime version.',
+      );
       await putNoUpdateAvailableInResponseAsync(req, res, protocolVersion);
       return;
     }
@@ -118,7 +129,7 @@ export default async function manifestEndpoint(req: NextApiRequest, res: NextApi
       throw maybeNoUpdateAvailableError;
     }
   } catch (error) {
-    logger.error(error);
+    logger.error({ error });
     res.statusCode = 404;
     res.json({ error });
   }
@@ -242,7 +253,7 @@ async function putUpdateInResponseAsync(
   const release = await database.getReleaseByPath(updateBundlePath + '.zip');
 
   if (release) {
-    logger.info(`Tracking download for release.`, { releaseId: release.id });
+    logger.info({ releaseId: release.id }, `Tracking download for release.`);
     await database.createTracking({
       platform,
       releaseId: release.id,

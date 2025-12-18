@@ -2,10 +2,12 @@ import { fromNodeHeaders } from 'better-auth/node';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { getLogger } from '@/api-utils/logger';
 import { StorageFactory } from '@/api-utils/storage/storage-factory';
 import { releases } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
+const logger = getLogger('releases');
 type Release = typeof releases.$inferSelect & { size: number };
 
 export default async function releasesHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -48,7 +50,7 @@ export default async function releasesHandler(req: NextApiRequest, res: NextApiR
 
     res.status(200).json({ releases });
   } catch (error) {
-    console.error('Failed to fetch releases:', error);
+    logger.error({ error }, 'Failed to fetch releases.');
     res.status(500).json({ error: 'Failed to fetch releases' });
   }
 }

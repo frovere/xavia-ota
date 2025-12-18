@@ -24,7 +24,7 @@ export default async function trackingByReleaseHandler(req: NextApiRequest, res:
 
   const { release_id } = req.query;
 
-  logger.info(`Fetching tracking data for release`, { release_id });
+  logger.info(`Fetching tracking data for release ID: ${release_id}`);
 
   if (!release_id || typeof release_id !== 'string') {
     res.status(400).json({ error: 'Release ID is required' });
@@ -37,7 +37,7 @@ export default async function trackingByReleaseHandler(req: NextApiRequest, res:
 
     res.status(200).json(trackings);
   } catch (error) {
-    logger.error(error);
+    logger.error({ error }, 'Failed to fetch tracking data.');
     res.status(500).json({ error: 'Failed to fetch tracking data' });
   }
 }

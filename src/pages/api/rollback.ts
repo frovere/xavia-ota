@@ -4,8 +4,11 @@ import { format } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { getLogger } from '@/api-utils/logger';
 import { StorageFactory } from '@/api-utils/storage/storage-factory';
 import { auth } from '@/lib/auth';
+
+const logger = getLogger('rollback');
 
 export default async function rollbackHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -60,7 +63,7 @@ export default async function rollbackHandler(req: NextApiRequest, res: NextApiR
 
     res.status(200).json({ success: true, newPath });
   } catch (error) {
-    console.error('Rollback error:', error);
+    logger.error({ error }, 'Rollback error.');
     res.status(500).json({ error: 'Rollback failed' });
   }
 }

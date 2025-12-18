@@ -36,7 +36,7 @@ export default async function allTrackingHandler(req: NextApiRequest, res: NextA
     const releases = await database.listReleases();
     res.status(200).json({ trackings, totalReleases: releases.length });
   } catch (error) {
-    logger.error(error);
+    logger.error({ error });
     res.status(500).json({ error: 'Failed to fetch tracking data' });
   }
 }

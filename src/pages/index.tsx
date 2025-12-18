@@ -42,7 +42,7 @@ export default function Home() {
           onSuccess: (ctx) => {
             const authToken = ctx.response.headers.get('set-auth-token');
             if (authToken) {
-              console.log('Storing bearer token in localStorage', authToken);
+              console.info('Storing bearer token in localStorage', authToken);
               localStorage.setItem('bearer-token', authToken);
             }
           },

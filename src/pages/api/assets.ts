@@ -4,6 +4,9 @@ import nullthrows from 'nullthrows';
 
 import { UpdateHelper } from '@/api-utils/helpers/update-helper';
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
+import { getLogger } from '@/api-utils/logger';
+
+const logger = getLogger('assets');
 
 export default async function assetsEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const { asset: assetPath, runtimeVersion, platform } = req.query;
@@ -50,7 +53,7 @@ export default async function assetsEndpoint(req: NextApiRequest, res: NextApiRe
     );
     res.end(asset);
   } catch (error) {
-    console.error(error);
+    logger.error({ error });
     res.statusCode = 500;
     res.json({ error });
   }

@@ -22,7 +22,7 @@ export class StorageFactory {
       } else if (storageType === 's3') {
         StorageFactory.instance = new S3Storage();
       } else {
-        logger.error('Unsupported storage type', { storageType });
+        logger.error(`Unsupported storage type ${storageType}`);
         throw new Error('Unsupported storage type');
       }
     }
