@@ -17,7 +17,7 @@ export async function getTestBearerToken() {
 export async function createTestUser() {
   try {
     await auth.api.signUpEmail({
-      body: { ...testUser, name: "Test User" },
+      body: { ...testUser, name: 'Test User' },
     });
   } catch (_error) {
     // User might already exist, ignore error
