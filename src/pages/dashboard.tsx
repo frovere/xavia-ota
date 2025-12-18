@@ -12,13 +12,17 @@ import { trackingDataQueryOpts as queryOpts } from '@/lib/query-opts';
 
 export async function getServerSideProps() {
   const database = DatabaseFactory.getDatabase();
-  const trackings = await database.getReleaseTrackingMetricsForAllReleases();
-  const releases = await database.listReleases();
+  const [trackings, totalReleases, totalRuntimes] = await Promise.all([
+    database.getReleaseTrackingMetricsForAllReleases(),
+    database.totalReleasesCount(),
+    database.totalRuntimesCount(),
+  ]);
 
   const queryClient = new QueryClient();
   await queryClient.setQueryData(queryOpts.queryKey, {
     trackings,
-    totalReleases: releases.length,
+    totalReleases,
+    totalRuntimes,
   });
 
   return {
@@ -55,7 +59,8 @@ function TimePeriodCardSkeleton() {
 function DataSkeleton() {
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
+        <StatCardSkeleton />
         <StatCardSkeleton />
         <StatCardSkeleton />
         <StatCardSkeleton />

@@ -34,6 +34,9 @@ export class MockDatabase implements DatabaseInterface {
   getReleaseTrackingMetrics = vi.fn().mockReturnValue(defaultTrackingMetrics);
   getReleaseTrackingMetricsForAllReleases = vi.fn().mockReturnValue(defaultTrackingMetrics);
   getLatestReleaseRecordForRuntimeVersion = vi.fn().mockReturnValue(defaultRelease);
+  getReleaseTrackingMetricsLastMonth = vi.fn().mockReturnValue([defaultTracking]);
+  totalReleasesCount = vi.fn().mockReturnValue(15);
+  totalRuntimesCount = vi.fn().mockReturnValue(5);
 
   reset() {
     this.createRelease.mockClear();
@@ -44,6 +47,9 @@ export class MockDatabase implements DatabaseInterface {
     this.getReleaseTrackingMetrics.mockClear();
     this.getReleaseTrackingMetricsForAllReleases.mockClear();
     this.getLatestReleaseRecordForRuntimeVersion.mockClear();
+    this.getReleaseTrackingMetricsLastMonth.mockClear();
+    this.totalReleasesCount.mockClear();
+    this.totalRuntimesCount.mockClear();
   }
 }
 

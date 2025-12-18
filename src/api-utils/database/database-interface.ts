@@ -15,7 +15,10 @@ export interface DatabaseInterface {
   ): Promise<typeof releasesTracking.$inferSelect>;
   getReleaseTrackingMetrics(releaseId: string): Promise<TrackingMetrics[]>;
   getReleaseTrackingMetricsForAllReleases(): Promise<TrackingMetrics[]>;
+  getReleaseTrackingMetricsLastMonth(): Promise<typeof releasesTracking.$inferSelect[]>;
   getLatestReleaseRecordForRuntimeVersion(
     runtimeVersion: string,
   ): Promise<typeof releases.$inferSelect | null>;
+  totalReleasesCount(): Promise<number>;
+  totalRuntimesCount(): Promise<number>;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { LucideApple, LucideBot, LucideDownload, LucidePackage } from 'lucide-react';
+import { LucideApple, LucideBot, LucideDownload, LucidePackage, LucideSmartphone } from 'lucide-react';
 
 import DashboardCharts from '@/components/dashboard-charts';
 import { Badge } from '@/components/ui/badge';
@@ -95,7 +95,7 @@ export function DashboardData() {
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         <StatCard
           title="Total Releases"
           value={data.totalReleases}
@@ -103,7 +103,13 @@ export function DashboardData() {
           backgroundColor="bg-primary"
         />
         <StatCard
-          title="All Time"
+          title="Total Runtimes"
+          value={data.totalRuntimes}
+          icon={LucideSmartphone}
+          backgroundColor="bg-violet-700"
+        />
+        <StatCard
+          title="All Time Downloads"
           value={totalDownloaded}
           icon={LucideDownload}
           backgroundColor="bg-purple-700"

@@ -11,6 +11,7 @@ const logger = getLogger('allTrackingHandler');
 export interface AllTrackingResponse {
   trackings: TrackingMetrics[];
   totalReleases: number;
+  totalRuntimes: number;
 }
 
 export default async function allTrackingHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -32,9 +33,13 @@ export default async function allTrackingHandler(req: NextApiRequest, res: NextA
 
   try {
     const database = DatabaseFactory.getDatabase();
-    const trackings = await database.getReleaseTrackingMetricsForAllReleases();
-    const releases = await database.listReleases();
-    res.status(200).json({ trackings, totalReleases: releases.length });
+    const [trackings, totalReleases, totalRuntimes] = await Promise.all([
+      database.getReleaseTrackingMetricsForAllReleases(),
+      database.totalReleasesCount(),
+      database.totalRuntimesCount(),
+    ]);
+
+    res.status(200).json({ trackings, totalReleases, totalRuntimes });
   } catch (error) {
     logger.error({ error });
     res.status(500).json({ error: 'Failed to fetch tracking data' });

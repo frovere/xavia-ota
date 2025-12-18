@@ -1,4 +1,6 @@
-import { count, desc, eq } from 'drizzle-orm';
+import { UTCDate } from '@date-fns/utc';
+import { subMonths } from 'date-fns';
+import { count, countDistinct, desc, eq, gte } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { releases, releasesTracking } from '@/db/schema';
@@ -53,6 +55,18 @@ export class PostgresDatabase implements DatabaseInterface {
     return result;
   }
 
+  async getReleaseTrackingMetricsLastMonth(): Promise<typeof releasesTracking.$inferSelect[]> {
+    const oneMonthAgo = subMonths(new UTCDate(), 1);
+
+    const result = await db
+      .select()
+      .from(releasesTracking)
+      .orderBy(desc(releasesTracking.downloadTimestamp))
+      .where(gte(releasesTracking.downloadTimestamp, oneMonthAgo.toISOString()));
+
+    return result;
+  }
+
   async createRelease(
     release: typeof releases.$inferInsert,
   ): Promise<typeof releases.$inferSelect> {
@@ -68,5 +82,15 @@ export class PostgresDatabase implements DatabaseInterface {
   async listReleases(): Promise<(typeof releases.$inferSelect)[]> {
     const result = await db.select().from(releases).orderBy(desc(releases.timestamp));
     return result;
+  }
+
+  async totalReleasesCount(): Promise<number> {
+    const result = await db.select({ count: count() }).from(releases);
+    return result[0].count;
+  }
+
+  async totalRuntimesCount(): Promise<number> {
+    const result = await db.select({ count: countDistinct(releases.runtimeVersion) }).from(releases);
+    return result[0].count;
   }
 }

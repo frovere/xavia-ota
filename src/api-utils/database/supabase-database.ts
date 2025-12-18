@@ -1,4 +1,6 @@
+import { UTCDate } from '@date-fns/utc';
 import { createClient } from '@supabase/supabase-js';
+import { subMonths } from 'date-fns';
 
 import { releases, releasesTracking } from '@/db/schema';
 import { Tables } from './database-factory';
@@ -99,6 +101,23 @@ export class SupabaseDatabase implements DatabaseInterface {
       },
     ];
   }
+
+  async getReleaseTrackingMetricsLastMonth(): Promise<typeof releasesTracking.$inferSelect[]> {
+    const oneMonthAgo = subMonths(new UTCDate(), 1);
+
+    const { data, error } = await this.supabase
+      .from(Tables.RELEASES_TRACKING)
+      .select()
+      .order('download_timestamp', { ascending: false })
+      .gte('download_timestamp', oneMonthAgo.toISOString());
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
   async createTracking(
     tracking: typeof releasesTracking.$inferInsert,
   ): Promise<typeof releasesTracking.$inferSelect> {
@@ -213,5 +232,29 @@ export class SupabaseDatabase implements DatabaseInterface {
       commitMessage: release.commit_message,
       updateId: release.update_id,
     }));
+  }
+
+  async totalReleasesCount(): Promise<number> {
+    const { count, error } = await this.supabase
+      .from(Tables.RELEASES)
+      .select('*', { count: 'estimated', head: true });
+
+    if (error) {
+      throw error;
+    }
+
+    return count || 0;
+  }
+
+  async totalRuntimesCount(): Promise<number> {
+    const { count, error } = await this.supabase
+      .from(Tables.RELEASES)
+      .select('runtime_version', { count: 'estimated', head: true });
+
+    if (error) {
+      throw error;
+    }
+
+    return count || 0;
   }
 }
