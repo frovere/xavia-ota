@@ -125,5 +125,16 @@
       "tailwindDirectives": true
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/__tests__/**/*.ts", "src/__tests__/**/*.tsx"],
+      "javascript": { "globals": [] },
+      "linter": {
+        "rules": {
+          "correctness": { "noUndeclaredVariables": "off" }
+        }
+      }
+    }
+  ],
   "assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } }
 }

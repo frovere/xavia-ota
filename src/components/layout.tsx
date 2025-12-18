@@ -1,8 +1,10 @@
 import { LucideLayoutDashboard, LucideLogOut, LucideTags } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
+import { signOut } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,8 +20,9 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    void router.push('/');
+    signOut();
+    localStorage.removeItem('bearer-token');
+    router.push('/');
   };
 
   return (

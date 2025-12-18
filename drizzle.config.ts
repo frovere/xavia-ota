@@ -1,11 +1,14 @@
-import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
 
+import './envConfig.ts';
+
+const pgUrl = process.env.DATABASE_TYPE === 'vercel' ? process.env.POSTGRES_URL! : process.env.DATABASE_URL!;
+
 export default defineConfig({
-  out: './drizzle',
-  schema: './db/schema.ts',
+  out: './src/drizzle',
+  schema: './src/db/schema',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.POSTGRES_URL! ?? process.env.DATABASE_URL!,
+    url: pgUrl,
   },
 });

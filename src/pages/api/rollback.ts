@@ -1,9 +1,11 @@
 import { UTCDate } from '@date-fns/utc';
+import { fromNodeHeaders } from 'better-auth/node';
 import { format } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { StorageFactory } from '@/api-utils/storage/storage-factory';
+import { auth } from '@/lib/auth';
 
 export default async function rollbackHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -26,6 +28,17 @@ export default async function rollbackHandler(req: NextApiRequest, res: NextApiR
   if (!commitHash) {
     res.status(400).json({ error: 'Missing commitHash' });
     return;
+  }
+
+  if (process.env.NODE_ENV !== 'test') {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    if (!session) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
   }
 
   try {

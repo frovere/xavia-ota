@@ -17,43 +17,48 @@ import {
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-
-async function login({ password }: { password: string }) {
-  const response = await fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error);
-  }
-
-  return data;
-}
+import { signIn } from '@/lib/auth-client';
 
 export default function Home() {
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const { mutate, isPending, isError, reset } = useMutation({
-    mutationFn: async () => await login({ password }),
-    onSuccess: () => {
-      localStorage.setItem('isAuthenticated', 'true');
-      void router.push('/dashboard');
+    mutationFn: async () => {
+      const { error } = await signIn.email({
+        email,
+        password,
+        callbackURL: '/dashboard',
+        fetchOptions: {
+          onError: (ctx) => {
+            if (ctx.error.code === 'INVALID_EMAIL') {
+              return;
+            }
+
+            inputRef.current?.focus();
+          },
+          onSuccess: (ctx) => {
+            const authToken = ctx.response.headers.get('set-auth-token');
+            if (authToken) {
+              console.log('Storing bearer token in localStorage', authToken);
+              localStorage.setItem('bearer-token', authToken);
+            }
+          },
+        },
+      });
+      if (error) {
+        throw error;
+      }
     },
     onError: (error) => {
-      setPassword('');
-      inputRef.current?.focus();
-      toast.error(
-        error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.',
-        {
-          position: 'bottom-center',
-        },
-      );
+      toast.error(error.message, {
+        position: 'bottom-center',
+      });
+    },
+    onSuccess: () => {
+      router.push('/dashboard');
     },
   });
 
@@ -76,7 +81,22 @@ export default function Home() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Field>
-              <FieldLabel htmlFor="password">Admin password</FieldLabel>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  reset();
+                  setEmail(e.target.value);
+                }}
+                className={isError ? 'animate-shake' : ''}
+                placeholder="mail@example.com"
+                autoComplete="current-email"
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
                 id="password"
                 ref={inputRef}

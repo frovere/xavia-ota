@@ -1,12 +1,28 @@
+import { fromNodeHeaders } from 'better-auth/node';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { StorageFactory } from '@/api-utils/storage/storage-factory';
+import { releases } from '@/db/schema';
+import { auth } from '@/lib/auth';
+
+type Release = typeof releases.$inferSelect & { size: number };
 
 export default async function releasesHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
+  }
+
+  if (process.env.NODE_ENV !== 'test') {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    if (!session) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
   }
 
   try {
@@ -15,22 +31,19 @@ export default async function releasesHandler(req: NextApiRequest, res: NextApiR
 
     const releasesWithCommitHash = await DatabaseFactory.getDatabase().listReleases();
 
-    const releases = [];
+    const releases: Release[] = [];
     for (const directory of directories) {
       const folderPath = `updates/${directory}`;
       const files = await storage.listFiles(folderPath);
-      const runtimeVersion = directory;
 
       for (const file of files) {
         const release = releasesWithCommitHash.find((r) => r.path === `${folderPath}/${file.name}`);
-        const commitHash = release ? release.commitHash : null;
+        if (!release) {
+          continue;
+        }
         releases.push({
-          path: release?.path || `${folderPath}/${file.name}`,
-          runtimeVersion,
-          timestamp: release?.timestamp || file.created_at,
+          ...release,
           size: file.metadata.size,
-          commitHash,
-          commitMessage: release?.commitMessage,
         });
       }
     }

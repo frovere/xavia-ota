@@ -1,8 +1,8 @@
-import crypto, { BinaryToTextEncoding } from 'crypto';
+import crypto, { BinaryLike, BinaryToTextEncoding } from 'crypto';
 
 export class HashHelper {
   static createHash(
-    file: Buffer,
+    file: BinaryLike,
     hashingAlgorithm: string,
     encoding: BinaryToTextEncoding,
   ): string {
