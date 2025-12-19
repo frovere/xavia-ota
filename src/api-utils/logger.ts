@@ -1,14 +1,21 @@
 import pino from 'pino';
 
+const pinoPretty =
+  process.env.NODE_ENV === 'production'
+    ? {}
+    : {
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            messageFormat: '[{loggerName}] {msg}',
+            translateTime: 'UTC:yyyy-mm-dd HH:MM:ss',
+          },
+        },
+      };
+
 const logger = pino({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      messageFormat: '[{loggerName}] {msg}',
-      translateTime: 'UTC:yyyy-mm-dd HH:MM:ss',
-    },
-  },
+  ...pinoPretty,
   base: {
     env: process.env.NODE_ENV,
     loggerName: 'app',
