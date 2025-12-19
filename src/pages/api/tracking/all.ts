@@ -1,18 +1,11 @@
 import { fromNodeHeaders } from 'better-auth/node';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { TrackingMetrics } from '@/api-utils/database/database-interface';
 import { getLogger } from '@/api-utils/logger';
 import { auth } from '@/lib/auth';
+import { AllTrackingResponse, getTrackingMetrics } from '@/lib/tracking-metrics';
 
 const logger = getLogger('allTrackingHandler');
-
-export interface AllTrackingResponse {
-  trackings: TrackingMetrics[];
-  totalReleases: number;
-  totalRuntimes: number;
-}
 
 export default async function allTrackingHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -32,14 +25,9 @@ export default async function allTrackingHandler(req: NextApiRequest, res: NextA
   logger.info('Fetching all tracking data for all releases');
 
   try {
-    const database = DatabaseFactory.getDatabase();
-    const [trackings, totalReleases, totalRuntimes] = await Promise.all([
-      database.getReleaseTrackingMetricsForAllReleases(),
-      database.totalReleasesCount(),
-      database.totalRuntimesCount(),
-    ]);
+    const trackingMetrics = await getTrackingMetrics();
 
-    res.status(200).json({ trackings, totalReleases, totalRuntimes });
+    res.status(200).json(trackingMetrics as AllTrackingResponse);
   } catch (error) {
     logger.error({ error });
     res.status(500).json({ error: 'Failed to fetch tracking data' });

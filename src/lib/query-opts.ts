@@ -1,7 +1,7 @@
 import { isServer, queryOptions } from '@tanstack/react-query';
 
 import { releases } from '@/db/schema';
-import { AllTrackingResponse } from '@/pages/api/tracking/all';
+import { AllTrackingResponse } from './tracking-metrics';
 
 type Release = typeof releases.$inferSelect & { size: number };
 

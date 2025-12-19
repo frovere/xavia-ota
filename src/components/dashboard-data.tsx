@@ -1,9 +1,17 @@
 'use client';
 
+import { UTCDate } from '@date-fns/utc';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { LucideApple, LucideBot, LucideDownload, LucidePackage, LucideSmartphone } from 'lucide-react';
+import { eachDayOfInterval, endOfDay, startOfDay, subWeeks } from 'date-fns';
+import {
+  LucideApple,
+  LucideBot,
+  LucideDownload,
+  LucidePackage,
+  LucideSmartphone,
+} from 'lucide-react';
 
-import DashboardCharts from '@/components/dashboard-charts';
+import DashboardCharts, { type ChartData } from '@/components/dashboard-charts';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { trackingDataQueryOpts as queryOpts } from '@/lib/query-opts';
@@ -83,15 +91,50 @@ function TimePeriodCard({
 
 export function DashboardData() {
   const { data } = useSuspenseQuery(queryOpts);
-  const { totalDownloaded, iosDownloads, androidDownloads } = data.trackings.reduce(
-    (acc, curr) => {
-      acc.totalDownloaded += curr.count;
-      acc.iosDownloads += curr.platform === 'ios' ? curr.count : 0;
-      acc.androidDownloads += curr.platform === 'android' ? curr.count : 0;
+  const {
+    total: allTimeDownloads,
+    ios: allTimeIosDownloads,
+    android: allTimeAndroidDownloads,
+  } = data.allTimetrackings;
+  const {
+    total: todayDownloads,
+    ios: todayIosDownloads,
+    android: todayAndroidDownloads,
+  } = data.todayMetrics;
+  const {
+    total: weekDownloads,
+    ios: weekIosDownloads,
+    android: weekAndroidDownloads,
+  } = data.lastWeekMetrics;
+  const {
+    total: monthDownloads,
+    ios: monthIosDownloads,
+    android: monthAndroidDownloads,
+  } = data.lastMonthMetrics;
+
+  const initialChartData: ChartData[] = eachDayOfInterval({
+    start: subWeeks(startOfDay(new UTCDate()), 1),
+    end: endOfDay(new UTCDate()),
+  }).map((date) => ({
+    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    ios: 0,
+    android: 0,
+  }));
+
+  const chartData: ChartData[] = data.lastWeekTrackings.reduce((acc, tracking) => {
+    const date = new UTCDate(tracking.downloadTimestamp);
+    const dateKey = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const dayEntry = acc.find((entry) => entry.date === dateKey);
+    if (!dayEntry) {
       return acc;
-    },
-    { totalDownloaded: 0, iosDownloads: 0, androidDownloads: 0 },
-  );
+    }
+    if (tracking.platform === 'ios') {
+      dayEntry.ios += 1;
+    } else if (tracking.platform === 'android') {
+      dayEntry.android += 1;
+    }
+    return acc;
+  }, initialChartData);
 
   return (
     <>
@@ -110,20 +153,20 @@ export function DashboardData() {
         />
         <StatCard
           title="All Time Downloads"
-          value={totalDownloaded}
+          value={allTimeDownloads}
           icon={LucideDownload}
           backgroundColor="bg-purple-700"
         />
         <StatCard
           title="iOS Downloads"
-          value={iosDownloads}
+          value={allTimeIosDownloads}
           icon={LucideApple}
           backgroundColor="bg-ios-blue"
           badge="iOS"
         />
         <StatCard
           title="Android Downloads"
-          value={androidDownloads}
+          value={allTimeAndroidDownloads}
           icon={LucideBot}
           backgroundColor="bg-android-green"
           badge="AND"
@@ -132,12 +175,31 @@ export function DashboardData() {
 
       {/* Time Period Cards - 3 Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <TimePeriodCard title="Today" total={9} ios={3} android={6} />
-        <TimePeriodCard title="This Week" total={33} ios={12} android={21} />
-        <TimePeriodCard title="This Month" total={200} ios={68} android={132} />
+        <TimePeriodCard
+          title="Today"
+          total={todayDownloads}
+          ios={todayIosDownloads}
+          android={todayAndroidDownloads}
+        />
+        <TimePeriodCard
+          title="This Week"
+          total={weekDownloads}
+          ios={weekIosDownloads}
+          android={weekAndroidDownloads}
+        />
+        <TimePeriodCard
+          title="This Month"
+          total={monthDownloads}
+          ios={monthIosDownloads}
+          android={monthAndroidDownloads}
+        />
       </div>
 
-      <DashboardCharts iosDownloads={iosDownloads} androidDownloads={androidDownloads} />
+      <DashboardCharts
+        iosDownloads={allTimeIosDownloads}
+        androidDownloads={allTimeAndroidDownloads}
+        chartData={chartData}
+      />
     </>
   );
 }

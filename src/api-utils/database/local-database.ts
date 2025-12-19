@@ -55,7 +55,7 @@ export class PostgresDatabase implements DatabaseInterface {
     return result;
   }
 
-  async getReleaseTrackingMetricsLastMonth(): Promise<typeof releasesTracking.$inferSelect[]> {
+  async getReleaseTrackingMetricsLastMonth(): Promise<(typeof releasesTracking.$inferSelect)[]> {
     const oneMonthAgo = subMonths(new UTCDate(), 1);
 
     const result = await db
@@ -90,7 +90,9 @@ export class PostgresDatabase implements DatabaseInterface {
   }
 
   async totalRuntimesCount(): Promise<number> {
-    const result = await db.select({ count: countDistinct(releases.runtimeVersion) }).from(releases);
+    const result = await db
+      .select({ count: countDistinct(releases.runtimeVersion) })
+      .from(releases);
     return result[0].count;
   }
 }

@@ -1,7 +1,6 @@
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { Suspense } from 'react';
 
-import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { DashboardChartsSkeleton } from '@/components/dashboard-charts';
 import { DashboardData } from '@/components/dashboard-data';
 import Layout from '@/components/layout';
@@ -9,21 +8,13 @@ import ProtectedRoute from '@/components/protected-route';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { trackingDataQueryOpts as queryOpts } from '@/lib/query-opts';
+import { getTrackingMetrics } from '@/lib/tracking-metrics';
 
 export async function getServerSideProps() {
-  const database = DatabaseFactory.getDatabase();
-  const [trackings, totalReleases, totalRuntimes] = await Promise.all([
-    database.getReleaseTrackingMetricsForAllReleases(),
-    database.totalReleasesCount(),
-    database.totalRuntimesCount(),
-  ]);
+  const trackingMetrics = await getTrackingMetrics();
 
   const queryClient = new QueryClient();
-  await queryClient.setQueryData(queryOpts.queryKey, {
-    trackings,
-    totalReleases,
-    totalRuntimes,
-  });
+  queryClient.setQueryData(queryOpts.queryKey, trackingMetrics);
 
   return {
     props: {

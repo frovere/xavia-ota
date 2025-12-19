@@ -102,7 +102,7 @@ export class SupabaseDatabase implements DatabaseInterface {
     ];
   }
 
-  async getReleaseTrackingMetricsLastMonth(): Promise<typeof releasesTracking.$inferSelect[]> {
+  async getReleaseTrackingMetricsLastMonth(): Promise<(typeof releasesTracking.$inferSelect)[]> {
     const oneMonthAgo = subMonths(new UTCDate(), 1);
 
     const { data, error } = await this.supabase

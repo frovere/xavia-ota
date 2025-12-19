@@ -21,16 +21,7 @@ import {
 } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Chart data for Last 7 Days
-const last7DaysData = [
-  { date: 'Dec 6', ios: 7, android: 10 },
-  { date: 'Dec 7', ios: 12, android: 9 },
-  { date: 'Dec 8', ios: 5, android: 8 },
-  { date: 'Dec 9', ios: 11, android: 13 },
-  { date: 'Dec 10', ios: 9, android: 6 },
-  { date: 'Dec 11', ios: 8, android: 7 },
-  { date: 'Dec 12', ios: 10, android: 12 },
-];
+export type ChartData = { date: string; ios: number; android: number };
 
 const chartConfig = {
   ios: {
@@ -74,9 +65,11 @@ export function DashboardChartsSkeleton() {
 export default function DashboardCharts({
   iosDownloads,
   androidDownloads,
+  chartData,
 }: {
   iosDownloads: number;
   androidDownloads: number;
+  chartData: ChartData[];
 }) {
   const platformData = [
     { name: 'Android', value: androidDownloads, fill: 'var(--color-android-green)' },
@@ -94,7 +87,7 @@ export default function DashboardCharts({
         <CardContent>
           <ChartContainer config={chartConfig} className="h-75 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={last7DaysData}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
