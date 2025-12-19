@@ -1,8 +1,9 @@
 import { UTCDate } from '@date-fns/utc';
-import { startOfDay, subWeeks } from 'date-fns';
+import { eachDayOfInterval, endOfDay, format, startOfDay, subMonths, subWeeks } from 'date-fns';
 
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
-import { releasesTracking } from '@/db/schema';
+
+export type ChartData = { date: string; ios: number; android: number };
 
 interface TimeBasedStats {
   total: number;
@@ -15,9 +16,9 @@ export interface AllTrackingResponse {
   todayMetrics: TimeBasedStats;
   lastWeekMetrics: TimeBasedStats;
   lastMonthMetrics: TimeBasedStats;
-  lastWeekTrackings: (typeof releasesTracking.$inferSelect)[];
   totalReleases: number;
   totalRuntimes: number;
+  chartData: ChartData[];
 }
 
 export async function getTrackingMetrics() {
@@ -31,23 +32,39 @@ export async function getTrackingMetrics() {
 
   const now = new UTCDate();
   const todayStart = startOfDay(now);
-  const weekStart = subWeeks(todayStart, 1);
+  const weekInterval = eachDayOfInterval({
+    start: subWeeks(todayStart, 1),
+    end: endOfDay(todayStart),
+  });
+  const monthInterval = eachDayOfInterval({
+    start: subMonths(todayStart, 1),
+    end: endOfDay(todayStart),
+  });
 
-  const calculateStats = (filterFn: (date: Date) => boolean): TimeBasedStats => {
-    const filtered = lastMonthTrackings.filter((t) => filterFn(new UTCDate(t.downloadTimestamp)));
-    const ios = filtered.filter((t) => t.platform === 'ios').length;
-    const android = filtered.filter((t) => t.platform === 'android').length;
+  const initialChartData: ChartData[] = weekInterval.map((date) => ({
+    date: format(date, 'MMM dd'),
+    ios: 0,
+    android: 0,
+  }));
 
-    return {
-      total: ios + android,
-      ios,
-      android,
-    };
+  const calculateStats = (dates: string[]): TimeBasedStats => {
+    return dates.reduce(
+      (acc, dateKey) => {
+        const dailyTrackings = lastMonthTrackings.get(dateKey) || [];
+        const iosCount = dailyTrackings.find((t) => t.platform === 'ios')?.count || 0;
+        const androidCount = dailyTrackings.find((t) => t.platform === 'android')?.count || 0;
+        acc.ios += iosCount;
+        acc.android += androidCount;
+        acc.total += iosCount + androidCount;
+        return acc;
+      },
+      { total: 0, ios: 0, android: 0 },
+    );
   };
 
-  const today = calculateStats((date) => date >= todayStart);
-  const thisWeek = calculateStats((date) => date >= weekStart);
-  const thisMonth = calculateStats(() => true);
+  const today = calculateStats([format(todayStart, 'yyyy-MM-dd')]);
+  const thisWeek = calculateStats(weekInterval.map((date) => format(date, 'yyyy-MM-dd')));
+  const thisMonth = calculateStats(monthInterval.map((date) => format(date, 'yyyy-MM-dd')));
   const ios = trackings.find((t) => t.platform === 'ios')?.count || 0;
   const android = trackings.find((t) => t.platform === 'android')?.count || 0;
 
@@ -57,17 +74,28 @@ export async function getTrackingMetrics() {
     android,
   };
 
-  const lastWeekTrackings = lastMonthTrackings.filter(
-    ({ downloadTimestamp }) => new UTCDate(downloadTimestamp) >= weekStart,
-  );
+  const chartData: ChartData[] = weekInterval.reduce((acc, weekDay) => {
+    const date = format(weekDay, 'yyyy-MM-dd');
+    const dateKey = format(weekDay, 'MMM dd');
+    const dayEntry = acc.find((entry) => entry.date === dateKey);
+    const dailyTrackings = lastMonthTrackings.get(date) || [];
+    if (!dayEntry) {
+      return acc;
+    }
+
+    dayEntry.ios += dailyTrackings.find((t) => t.platform === 'ios')?.count || 0;
+    dayEntry.android += dailyTrackings.find((t) => t.platform === 'android')?.count || 0;
+
+    return acc;
+  }, initialChartData);
 
   return {
     allTimetrackings: allTime,
     todayMetrics: today,
     lastWeekMetrics: thisWeek,
     lastMonthMetrics: thisMonth,
-    lastWeekTrackings,
     totalReleases,
     totalRuntimes,
+    chartData,
   } as AllTrackingResponse;
 }

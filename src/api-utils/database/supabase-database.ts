@@ -102,7 +102,7 @@ export class SupabaseDatabase implements DatabaseInterface {
     ];
   }
 
-  async getReleaseTrackingMetricsLastMonth(): Promise<(typeof releasesTracking.$inferSelect)[]> {
+  async getReleaseTrackingsLastMonth(): Promise<(typeof releasesTracking.$inferSelect)[]> {
     const oneMonthAgo = subMonths(new UTCDate(), 1);
 
     const { data, error } = await this.supabase
@@ -116,6 +116,41 @@ export class SupabaseDatabase implements DatabaseInterface {
     }
 
     return data;
+  }
+
+  async getReleaseTrackingMetricsLastMonth(): Promise<Map<string, TrackingMetrics[]>> {
+    const oneMonthAgo = subMonths(new UTCDate(), 1);
+
+    const { data, error } = await this.supabase
+      .from(Tables.RELEASES_TRACKING)
+      .select('platform, download_timestamp')
+      .gte('download_timestamp', oneMonthAgo.toISOString());
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const metricsMap = new Map<string, TrackingMetrics[]>();
+
+    data.forEach((record) => {
+      const dateKey = record.download_timestamp.split('T')[0];
+      const platform = record.platform;
+
+      if (!metricsMap.has(dateKey)) {
+        metricsMap.set(dateKey, []);
+      }
+
+      const platformMetrics = metricsMap.get(dateKey)!;
+      const existingMetric = platformMetrics.find((m) => m.platform === platform);
+
+      if (existingMetric) {
+        existingMetric.count += 1;
+      } else {
+        platformMetrics.push({ platform, count: 1 });
+      }
+    });
+
+    return metricsMap;
   }
 
   async createTracking(

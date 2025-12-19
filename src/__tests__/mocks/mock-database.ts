@@ -25,6 +25,30 @@ const defaultTrackingMetrics: TrackingMetrics[] = [
   { platform: 'android', count: 5 },
 ];
 
+const defaultMetricsMap = new Map<string, TrackingMetrics[]>([
+  [
+    'Jan 01',
+    [
+      { platform: 'ios', count: 2 },
+      { platform: 'android', count: 1 },
+    ],
+  ],
+  [
+    'Jan 02',
+    [
+      { platform: 'ios', count: 3 },
+      { platform: 'android', count: 4 },
+    ],
+  ],
+  [
+    'Jan 03',
+    [
+      { platform: 'ios', count: 5 },
+      { platform: 'android', count: 0 },
+    ],
+  ],
+]);
+
 export class MockDatabase implements DatabaseInterface {
   createRelease = vi.fn().mockReturnValue(defaultRelease);
   getRelease = vi.fn().mockReturnValue(defaultRelease);
@@ -34,7 +58,8 @@ export class MockDatabase implements DatabaseInterface {
   getReleaseTrackingMetrics = vi.fn().mockReturnValue(defaultTrackingMetrics);
   getReleaseTrackingMetricsForAllReleases = vi.fn().mockReturnValue(defaultTrackingMetrics);
   getLatestReleaseRecordForRuntimeVersion = vi.fn().mockReturnValue(defaultRelease);
-  getReleaseTrackingMetricsLastMonth = vi.fn().mockReturnValue([defaultTracking]);
+  getReleaseTrackingsLastMonth = vi.fn().mockReturnValue([defaultTracking]);
+  getReleaseTrackingMetricsLastMonth = vi.fn().mockReturnValue(defaultMetricsMap);
   totalReleasesCount = vi.fn().mockReturnValue(15);
   totalRuntimesCount = vi.fn().mockReturnValue(5);
 
@@ -47,6 +72,7 @@ export class MockDatabase implements DatabaseInterface {
     this.getReleaseTrackingMetrics.mockClear();
     this.getReleaseTrackingMetricsForAllReleases.mockClear();
     this.getLatestReleaseRecordForRuntimeVersion.mockClear();
+    this.getReleaseTrackingsLastMonth.mockClear();
     this.getReleaseTrackingMetricsLastMonth.mockClear();
     this.totalReleasesCount.mockClear();
     this.totalRuntimesCount.mockClear();

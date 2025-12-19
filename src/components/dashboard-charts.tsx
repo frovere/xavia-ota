@@ -20,8 +20,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
-
-export type ChartData = { date: string; ios: number; android: number };
+import { ChartData } from '@/lib/tracking-metrics';
 
 const chartConfig = {
   ios: {

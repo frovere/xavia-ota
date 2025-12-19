@@ -1,8 +1,6 @@
 'use client';
 
-import { UTCDate } from '@date-fns/utc';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { eachDayOfInterval, endOfDay, startOfDay, subWeeks } from 'date-fns';
 import {
   LucideApple,
   LucideBot,
@@ -11,7 +9,7 @@ import {
   LucideSmartphone,
 } from 'lucide-react';
 
-import DashboardCharts, { type ChartData } from '@/components/dashboard-charts';
+import DashboardCharts from '@/components/dashboard-charts';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { trackingDataQueryOpts as queryOpts } from '@/lib/query-opts';
@@ -24,7 +22,7 @@ function StatCard({
   badge,
 }: {
   title: string;
-  value: number | string;
+  value: number;
   icon: React.ComponentType<{ className?: string }>;
   backgroundColor: string;
   badge?: string;
@@ -35,7 +33,7 @@ function StatCard({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <p className="text-sm font-medium text-white/80">{title}</p>
-            <p className="text-3xl font-bold mt-2">{value}</p>
+            <p className="text-3xl font-bold mt-2">{value.toLocaleString()}</p>
           </div>
           <Icon className="w-8 h-8 text-white/60" />
         </div>
@@ -67,21 +65,21 @@ function TimePeriodCard({
           <LucideDownload className="w-4 h-4" />
           <h3 className="font-semibold">{title}</h3>
         </div>
-        <p className="text-3xl font-bold mb-4">{total}</p>
+        <p className="text-3xl font-bold mb-4">{total.toLocaleString()}</p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <LucideApple className="w-4 h-4" />
               <span>iOS</span>
             </div>
-            <span>{ios}</span>
+            <span>{ios.toLocaleString()}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <LucideBot className="w-4 h-4" />
               <span>Android</span>
             </div>
-            <span>{android}</span>
+            <span>{android.toLocaleString()}</span>
           </div>
         </div>
       </CardContent>
@@ -111,30 +109,6 @@ export function DashboardData() {
     ios: monthIosDownloads,
     android: monthAndroidDownloads,
   } = data.lastMonthMetrics;
-
-  const initialChartData: ChartData[] = eachDayOfInterval({
-    start: subWeeks(startOfDay(new UTCDate()), 1),
-    end: endOfDay(new UTCDate()),
-  }).map((date) => ({
-    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    ios: 0,
-    android: 0,
-  }));
-
-  const chartData: ChartData[] = data.lastWeekTrackings.reduce((acc, tracking) => {
-    const date = new UTCDate(tracking.downloadTimestamp);
-    const dateKey = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const dayEntry = acc.find((entry) => entry.date === dateKey);
-    if (!dayEntry) {
-      return acc;
-    }
-    if (tracking.platform === 'ios') {
-      dayEntry.ios += 1;
-    } else if (tracking.platform === 'android') {
-      dayEntry.android += 1;
-    }
-    return acc;
-  }, initialChartData);
 
   return (
     <>
@@ -198,7 +172,7 @@ export function DashboardData() {
       <DashboardCharts
         iosDownloads={allTimeIosDownloads}
         androidDownloads={allTimeAndroidDownloads}
-        chartData={chartData}
+        chartData={data.chartData}
       />
     </>
   );

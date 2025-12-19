@@ -1,6 +1,6 @@
 import { UTCDate } from '@date-fns/utc';
-import { subMonths } from 'date-fns';
-import { count, countDistinct, desc, eq, gte } from 'drizzle-orm';
+import { format, subMonths } from 'date-fns';
+import { count, countDistinct, desc, eq, gte, sql } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { releases, releasesTracking } from '@/db/schema';
@@ -55,7 +55,7 @@ export class PostgresDatabase implements DatabaseInterface {
     return result;
   }
 
-  async getReleaseTrackingMetricsLastMonth(): Promise<(typeof releasesTracking.$inferSelect)[]> {
+  async getReleaseTrackingsLastMonth(): Promise<(typeof releasesTracking.$inferSelect)[]> {
     const oneMonthAgo = subMonths(new UTCDate(), 1);
 
     const result = await db
@@ -65,6 +65,36 @@ export class PostgresDatabase implements DatabaseInterface {
       .where(gte(releasesTracking.downloadTimestamp, oneMonthAgo.toISOString()));
 
     return result;
+  }
+
+  async getReleaseTrackingMetricsLastMonth(): Promise<Map<string, TrackingMetrics[]>> {
+    const oneMonthAgo = subMonths(new UTCDate(), 1);
+
+    const result = await db
+      .select({
+        day: sql<string>`DATE(${releasesTracking.downloadTimestamp})`.as('day'),
+        platform: releasesTracking.platform,
+        count: count(),
+      })
+      .from(releasesTracking)
+      .where(gte(releasesTracking.downloadTimestamp, oneMonthAgo.toISOString()))
+      .groupBy(
+        releasesTracking.releaseId,
+        releasesTracking.platform,
+        sql`DATE(${releasesTracking.downloadTimestamp})`,
+      );
+
+    const metricsMap = new Map<string, TrackingMetrics[]>();
+
+    result.forEach((row) => {
+      const day = format(new UTCDate(row.day), 'yyyy-MM-dd');
+      if (!metricsMap.has(day)) {
+        metricsMap.set(day, []);
+      }
+      metricsMap.get(day)!.push({ platform: row.platform, count: Number(row.count) });
+    });
+
+    return metricsMap;
   }
 
   async createRelease(
