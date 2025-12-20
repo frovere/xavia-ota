@@ -51,7 +51,7 @@ export default function ReleasesPage() {
       <Layout>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Releases</h1>
+            <h1 className="text-3xl font-bold">Releases</h1>
             <RefreshReleasesButton />
           </div>
           <ErrorBoundary

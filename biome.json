@@ -64,7 +64,7 @@
       "security": {
         "noGlobalEval": "warn",
         "noDangerouslySetInnerHtml": "warn"
-       },
+      },
       "style": {
         "noYodaExpression": "warn",
         "useArrayLiterals": "warn",
