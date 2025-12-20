@@ -4,10 +4,16 @@ import { subMonths } from 'date-fns';
 
 import { releases, releasesTracking } from '@/db/schema';
 import { Tables } from './database-factory';
-import { DatabaseInterface, TrackingMetrics } from './database-interface';
+import {
+  DatabaseInterface,
+  RuntimeData,
+  RuntimePaginationResult,
+  TrackingMetrics,
+} from './database-interface';
 
 export class SupabaseDatabase implements DatabaseInterface {
   private readonly supabase;
+  private readonly runtimePaginationLimit = 20;
 
   constructor() {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -291,5 +297,75 @@ export class SupabaseDatabase implements DatabaseInterface {
     }
 
     return count || 0;
+  }
+
+  async listRuntimes(nextCursor: string): Promise<RuntimePaginationResult> {
+    const limit = nextCursor === '' ? this.runtimePaginationLimit + 3 : this.runtimePaginationLimit;
+
+    let query = this.supabase
+      .from(Tables.RELEASES)
+      .select('runtime_version, timestamp', { count: 'estimated' })
+      .order('runtime_version', { ascending: false })
+      .limit(limit + 1);
+
+    if (nextCursor) {
+      query = query.lt('runtime_version', nextCursor);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      return {
+        data: [],
+        nextCursor: null,
+        hasNextCursor: false,
+      };
+    }
+
+    const hasNextCursor = data.length > limit;
+    if (hasNextCursor) {
+      data.pop();
+    }
+
+    const runtimesMap = new Map<string, { lastReleasedAt: string; totalReleases: number }>();
+
+    data.forEach((record) => {
+      const existing = runtimesMap.get(record.runtime_version);
+      const recordTimestamp = record.timestamp;
+
+      if (existing) {
+        existing.totalReleases += 1;
+        if (new Date(recordTimestamp) > new Date(existing.lastReleasedAt)) {
+          existing.lastReleasedAt = recordTimestamp;
+        }
+      } else {
+        runtimesMap.set(record.runtime_version, {
+          lastReleasedAt: recordTimestamp,
+          totalReleases: 1,
+        });
+      }
+    });
+
+    const runtimesData: RuntimeData[] = Array.from(runtimesMap.entries()).map(
+      ([runtimeVersion, info]) => ({
+        runtimeVersion,
+        lastReleasedAt: info.lastReleasedAt,
+        totalReleases: info.totalReleases,
+      }),
+    );
+
+    const newNextCursor = hasNextCursor
+      ? runtimesData[runtimesData.length - 1].runtimeVersion
+      : null;
+
+    return {
+      data: runtimesData,
+      nextCursor: newNextCursor,
+      hasNextCursor,
+    };
   }
 }

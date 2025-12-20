@@ -1,5 +1,6 @@
-import { isServer, queryOptions } from '@tanstack/react-query';
+import { infiniteQueryOptions, isServer, queryOptions } from '@tanstack/react-query';
 
+import { RuntimePaginationResult } from '@/api-utils/database/database-interface';
 import { releases } from '@/db/schema';
 import { AllTrackingResponse } from './tracking-metrics';
 
@@ -53,4 +54,30 @@ export const releasesQueryOpts = queryOptions({
   queryKey: ['releases'],
   queryFn: async () => await fetchReleases(),
   staleTime: 1000 * 60 * 5,
+});
+
+async function fetchRuntimes({ pageParam }: { pageParam: string }) {
+  const token = localStorage.getItem('bearer-token');
+  if (!token) {
+    throw new Error('Unauthenticated');
+  }
+
+  const response = await fetch(`${baseUrl}/api/runtimes?cursor=${pageParam}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch runtimes');
+  }
+  const data = await response.json();
+  return data as RuntimePaginationResult;
+}
+
+export const runtimesQueryOpts = infiniteQueryOptions({
+  queryKey: ['runtimes'],
+  queryFn: async ({ pageParam }) => await fetchRuntimes({ pageParam }),
+  initialPageParam: '',
+  getNextPageParam: (lastPage) => (lastPage.hasNextCursor ? lastPage.nextCursor : null),
+  staleTime: 1000 * 60 * 15,
 });

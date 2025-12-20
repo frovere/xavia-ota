@@ -1,4 +1,4 @@
-import { LucideLayoutDashboard, LucideLogOut, LucideTags } from 'lucide-react';
+import { LucideBox, LucideLayoutDashboard, LucideLogOut, LucideTags } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
@@ -17,6 +17,7 @@ export default function Layout({ children, className, ...props }: LayoutProps) {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LucideLayoutDashboard className="h-5 w-5" /> },
     { name: 'Releases', path: '/releases', icon: <LucideTags className="h-5 w-5" /> },
+    { name: 'Runtimes', path: '/runtimes', icon: <LucideBox className="h-5 w-5" /> },
   ];
 
   const handleLogout = () => {

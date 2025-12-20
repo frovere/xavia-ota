@@ -5,7 +5,20 @@ export interface TrackingMetrics {
   count: number;
 }
 
+export interface RuntimeData {
+  runtimeVersion: string;
+  lastReleasedAt: string;
+  totalReleases: number;
+}
+
+export interface RuntimePaginationResult {
+  data: RuntimeData[];
+  nextCursor: string | null;
+  hasNextCursor: boolean;
+}
+
 export interface DatabaseInterface {
+  runtimePaginationLimit: number;
   createRelease(release: typeof releases.$inferInsert): Promise<typeof releases.$inferSelect>;
   getRelease(id: string): Promise<typeof releases.$inferSelect | null>;
   getReleaseByPath(path: string): Promise<typeof releases.$inferSelect | null>;
@@ -22,4 +35,5 @@ export interface DatabaseInterface {
   ): Promise<typeof releases.$inferSelect | null>;
   totalReleasesCount(): Promise<number>;
   totalRuntimesCount(): Promise<number>;
+  listRuntimes(nextCursor: string): Promise<RuntimePaginationResult>;
 }

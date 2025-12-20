@@ -1,12 +1,19 @@
 import { UTCDate } from '@date-fns/utc';
-import { format, subMonths } from 'date-fns';
-import { count, countDistinct, desc, eq, gte, sql } from 'drizzle-orm';
+import { format, intlFormatDistance, subMonths } from 'date-fns';
+import { count, countDistinct, desc, eq, gte, max, sql } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { releases, releasesTracking } from '@/db/schema';
-import { DatabaseInterface, TrackingMetrics } from './database-interface';
+import {
+  DatabaseInterface,
+  RuntimeData,
+  RuntimePaginationResult,
+  TrackingMetrics,
+} from './database-interface';
 
 export class PostgresDatabase implements DatabaseInterface {
+  private readonly runtimePaginationLimit = 20;
+
   async getLatestReleaseRecordForRuntimeVersion(
     runtimeVersion: string,
   ): Promise<typeof releases.$inferSelect | null> {
@@ -124,5 +131,56 @@ export class PostgresDatabase implements DatabaseInterface {
       .select({ count: countDistinct(releases.runtimeVersion) })
       .from(releases);
     return result[0].count;
+  }
+
+  async listRuntimes(queryNextCursor: string): Promise<RuntimePaginationResult> {
+    const limit =
+      queryNextCursor === '' ? this.runtimePaginationLimit + 3 : this.runtimePaginationLimit;
+
+    const result = await db
+      .select({
+        runtimeVersion: releases.runtimeVersion,
+        lastReleasedAt: max(releases.timestamp),
+        totalReleases: count(),
+      })
+      .from(releases)
+      .groupBy(releases.runtimeVersion)
+      .where(
+        queryNextCursor
+          ? sql`string_to_array(${releases.runtimeVersion}, '.')::bigint[] <= string_to_array(${queryNextCursor}, '.')::bigint[]`
+          : undefined,
+      )
+      .orderBy(desc(sql`string_to_array(${releases.runtimeVersion}, '.')::bigint[]`))
+      .limit(limit + 1);
+
+    let nextCursor: string | null = null;
+    const hasNextCursor = result.length > limit;
+
+    if (result.length === 0) {
+      return {
+        data: [],
+        nextCursor,
+        hasNextCursor,
+      };
+    }
+
+    if (hasNextCursor) {
+      nextCursor = result[result.length - 1].runtimeVersion;
+      result.pop();
+    }
+
+    const data = result.map(
+      (row): RuntimeData => ({
+        runtimeVersion: row.runtimeVersion,
+        lastReleasedAt: row.lastReleasedAt!,
+        totalReleases: row.totalReleases,
+      }),
+    );
+
+    return {
+      data,
+      nextCursor,
+      hasNextCursor,
+    };
   }
 }

@@ -1,6 +1,10 @@
 import { vi } from 'vitest';
 
-import type { DatabaseInterface, TrackingMetrics } from '@/api-utils/database/database-interface';
+import type {
+  DatabaseInterface,
+  RuntimePaginationResult,
+  TrackingMetrics,
+} from '@/api-utils/database/database-interface';
 import type { releases, releasesTracking } from '@/db/schema';
 
 const defaultRelease: typeof releases.$inferSelect = {
@@ -49,6 +53,23 @@ const defaultMetricsMap = new Map<string, TrackingMetrics[]>([
   ],
 ]);
 
+const defaultRuntimesPaginationResult: RuntimePaginationResult = {
+  data: [
+    {
+      runtimeVersion: '1.0.0',
+      lastReleasedAt: new Date().toISOString(),
+      totalReleases: 5,
+    },
+    {
+      runtimeVersion: '1.1.0',
+      lastReleasedAt: new Date().toISOString(),
+      totalReleases: 3,
+    },
+  ],
+  nextCursor: null,
+  hasNextCursor: false,
+};
+
 export class MockDatabase implements DatabaseInterface {
   createRelease = vi.fn().mockReturnValue(defaultRelease);
   getRelease = vi.fn().mockReturnValue(defaultRelease);
@@ -62,6 +83,7 @@ export class MockDatabase implements DatabaseInterface {
   getReleaseTrackingMetricsLastMonth = vi.fn().mockReturnValue(defaultMetricsMap);
   totalReleasesCount = vi.fn().mockReturnValue(15);
   totalRuntimesCount = vi.fn().mockReturnValue(5);
+  listRuntimes = vi.fn().mockReturnValue(defaultRuntimesPaginationResult);
 
   reset() {
     this.createRelease.mockClear();

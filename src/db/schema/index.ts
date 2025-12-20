@@ -16,6 +16,9 @@ export const releases = pgTable(
     index('releases_runtime_version_idx').on(table.runtimeVersion),
     index('releases_timestamp_idx').on(table.timestamp),
     index('releases_path_idx').on(table.path),
+    index('releases_runtime_version_semver_idx').on(
+      sql`(string_to_array(${table.runtimeVersion}, '.')::bigint[])`,
+    ),
   ],
 );
 
