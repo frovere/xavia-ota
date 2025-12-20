@@ -99,7 +99,7 @@ function formatLocaleDate(dateString: string) {
 
 function RuntimeCardLarge({ runtime }: { runtime: RuntimeData }) {
   return (
-    <Card className="bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.15),transparent_50%)] border-border/60 overflow-hidden h-112 relative">
+    <Card className="bg-[radial-gradient(ellipse_at_top_left,oklch(from_var(--color-accent)_l_c_h/0.25),transparent_50%)] border-border/60 overflow-hidden h-112 relative">
       <CardContent className="p-8 h-full flex flex-col justify-between">
         <div>
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Runtime</p>

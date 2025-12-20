@@ -68,9 +68,9 @@ export default function Home() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-12">
+    <div className="relative flex min-h-screen items-center justify-center bg-linear-to-br from-muted/80 via-primary/10 to-muted/80 px-4 py-12">
       <div
-        className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.25),transparent_55%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(from_var(--color-primary)_l_c_h/0.15)transparent_55%)]"
         aria-hidden="true"
       />
       <form onSubmit={handleLogin} className="relative z-10 w-full max-w-md">
