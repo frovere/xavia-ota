@@ -1,12 +1,7 @@
 import { UTCDate } from '@date-fns/utc';
-import {
-  dehydrate,
-  QueryClient,
-  useSuspenseInfiniteQuery,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { dehydrate, QueryClient, useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { intlFormatDistance } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { LucideBox, LucideHelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -89,7 +84,7 @@ function DecorativeBars({ size }: VariantProps<typeof decorativeBarsVariants>) {
 
 function formatDateRelative(dateString: string) {
   const date = new Date(dateString);
-  return intlFormatDistance(new UTCDate(date), new UTCDate());
+  return formatDistance(new UTCDate(date), new UTCDate(), { addSuffix: true });
 }
 
 function formatLocaleDate(dateString: string) {
@@ -223,9 +218,32 @@ function RuntimesCards({
           <div className="col-span-3">
             <RuntimeCardLarge runtime={mainRuntime} />
           </div>
-          <div className="col-span-2 flex flex-col gap-4">
-            <RuntimeCardMedium runtime={secondRuntime} />
-            <RuntimeCardMedium runtime={thirdRuntime} />
+          <div className="col-span-2">
+            {secondRuntime ? (
+              <div className="flex flex-col gap-4">
+                <RuntimeCardMedium runtime={secondRuntime} />
+                <RuntimeCardMedium runtime={thirdRuntime} />
+              </div>
+            ) : (
+              <Card className="bg-card/50 border-border/60 h-112 w-full relative">
+                <CardContent>
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <LucideBox />
+                      </EmptyMedia>
+                      <EmptyTitle>No more runtimes found</EmptyTitle>
+                      <EmptyDescription>
+                        Once your upload more runtime versions, they will appear here.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                  <div className="absolute bottom-0 right-0 opacity-40">
+                    <DecorativeBars size="medium" />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
 
@@ -299,7 +317,7 @@ function RuntimesSkeleton() {
       </div>
 
       <div className="grid grid-cols-5 gap-4">
-        {Array.from({ length: 20 }).map((_, index) => {
+        {Array.from({ length: 10 }).map((_, index) => {
           const key = `runtime-skeleton-${index}`;
           return <Skeleton key={key} className="h-37.5 bg-card/50" />;
         })}
