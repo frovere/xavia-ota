@@ -355,7 +355,7 @@ export default function RuntimesPage() {
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Runtime versions deployed to your applications</p>
+                  <p>Runtime versions with updates released</p>
                 </TooltipContent>
               </Tooltip>
             </div>

@@ -15,6 +15,7 @@
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
     "db:generate": "drizzle-kit generate",
+    "auth:signup": "bun --bun run ./scripts/sign-up.ts",
     "prepare": "husky",
     "release": "bash ./scripts/release.sh",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
