@@ -1,12 +1,11 @@
-'use client';
-
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   LucideApple,
   LucideBot,
   LucideDownload,
+  type LucideIcon,
+  LucideLayersPlus,
   LucidePackage,
-  LucideSmartphone,
 } from 'lucide-react';
 
 import DashboardCharts from '@/components/dashboard-charts';
@@ -23,7 +22,7 @@ function StatCard({
 }: {
   title: string;
   value: number;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   backgroundColor: string;
   badge?: string;
 }) {
@@ -114,15 +113,15 @@ export function DashboardData() {
     <>
       <div className="grid grid-cols-5 gap-4">
         <StatCard
-          title="Total Releases"
+          title="Total Releases Updates"
           value={data.totalReleases}
-          icon={LucidePackage}
+          icon={LucideLayersPlus}
           backgroundColor="bg-primary"
         />
         <StatCard
           title="Total Runtimes"
           value={data.totalRuntimes}
-          icon={LucideSmartphone}
+          icon={LucidePackage}
           backgroundColor="bg-violet-700"
         />
         <StatCard
@@ -147,7 +146,6 @@ export function DashboardData() {
         />
       </div>
 
-      {/* Time Period Cards - 3 Cards */}
       <div className="grid grid-cols-3 gap-4">
         <TimePeriodCard
           title="Today"

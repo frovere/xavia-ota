@@ -1,3 +1,5 @@
+'use client';
+
 import { LucidePieChart, LucideTrendingUp } from 'lucide-react';
 import {
   CartesianGrid,
