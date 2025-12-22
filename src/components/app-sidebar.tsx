@@ -1,10 +1,4 @@
-import {
-  LucideBox,
-  type LucideIcon,
-  LucideLayoutDashboard,
-  LucideLogOut,
-  LucideTags,
-} from 'lucide-react';
+import { LucideBox, type LucideIcon, LucideLayoutDashboard, LucideLogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -32,16 +26,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       isActive: router.pathname === '/dashboard',
     },
     {
-      name: 'Releases',
-      path: '/releases',
-      icon: LucideTags,
-      isActive: router.pathname === '/releases',
-    },
-    {
       name: 'Runtimes',
       path: '/runtimes',
       icon: LucideBox,
-      isActive: router.pathname === '/runtimes',
+      isActive: router.pathname.includes('/runtimes'),
     },
   ];
 
@@ -66,7 +54,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           {navItems.map((item) => (
             <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild isActive={item.isActive}>
+              <SidebarMenuButton asChild size="lg" isActive={item.isActive}>
                 <Link href={item.path}>
                   <item.icon />
                   <span>{item.name}</span>
@@ -79,16 +67,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <ThemeToggle />
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              variant="outline"
-              size="lg"
-              onClick={handleLogout}
-              className="justify-between">
+            <SidebarMenuButton variant="outline" size="lg" onClick={handleLogout}>
               <span>Logout</span>
-              <LucideLogOut />
+              <LucideLogOut className="ml-auto" />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
