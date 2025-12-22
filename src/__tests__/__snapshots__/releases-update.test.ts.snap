@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Releases updates API > should handle errors gracefully 1`] = `
+{
+  "error": "Failed to fetch releases",
+}
+`;
+
+exports[`Releases updates API > should return 401 for missing bearer token 1`] = `
+{
+  "error": "Unauthorized",
+}
+`;
+
+exports[`Releases updates API > should return 405 for non-GET requests 1`] = `
+{
+  "error": "Method not allowed",
+}
+`;
+
+exports[`Releases updates API > should return releases successfully 1`] = `
+{
+  "releases": [
+    {
+      "commitHash": "abc123",
+      "commitMessage": "Mock commit message",
+      "id": "mock-release-id",
+      "path": "updates/1.0.0/update.zip",
+      "runtimeVersion": "1.0.0",
+      "size": 1000,
+      "timestamp": "2024-03-20T00:00:00Z",
+      "updateId": "mock-update-id",
+    },
+  ],
+}
+`;
