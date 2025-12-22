@@ -71,7 +71,7 @@ const defaultRuntimesPaginationResult: () => RuntimePaginationResult = () => ({
 });
 
 export class MockDatabase implements DatabaseInterface {
-  runtimePaginationLimit = 20;
+  readonly runtimePaginationLimit = 20;
   createRelease = vi.fn().mockReturnValue(defaultRelease);
   getRelease = vi.fn().mockReturnValue(defaultRelease);
   getReleaseByPath = vi.fn().mockReturnValue(defaultRelease);

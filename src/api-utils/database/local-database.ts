@@ -12,7 +12,7 @@ import {
 } from './database-interface';
 
 export class PostgresDatabase implements DatabaseInterface {
-  private readonly runtimePaginationLimit = 20;
+  readonly runtimePaginationLimit = 20;
 
   async getLatestReleaseRecordForRuntimeVersion(
     runtimeVersion: string,

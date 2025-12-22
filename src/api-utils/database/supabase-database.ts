@@ -13,7 +13,7 @@ import {
 
 export class SupabaseDatabase implements DatabaseInterface {
   private readonly supabase;
-  private readonly runtimePaginationLimit = 20;
+  readonly runtimePaginationLimit = 20;
 
   constructor() {
     const supabaseUrl = process.env.SUPABASE_URL;

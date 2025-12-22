@@ -27,6 +27,7 @@ export class DatabaseFactory {
       case 'pg':
       case 'pg-bun':
       case 'pg-vercel':
+      case 'pg-supabase':
         DatabaseFactory.instance = new PostgresDatabase();
         break;
       default:
