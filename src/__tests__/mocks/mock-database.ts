@@ -53,7 +53,7 @@ const defaultMetricsMap = new Map<string, TrackingMetrics[]>([
   ],
 ]);
 
-const defaultRuntimesPaginationResult: RuntimePaginationResult = {
+const defaultRuntimesPaginationResult: () => RuntimePaginationResult = () => ({
   data: [
     {
       runtimeVersion: '1.0.0',
@@ -68,7 +68,7 @@ const defaultRuntimesPaginationResult: RuntimePaginationResult = {
   ],
   nextCursor: null,
   hasNextCursor: false,
-};
+});
 
 export class MockDatabase implements DatabaseInterface {
   runtimePaginationLimit = 20;
@@ -85,7 +85,7 @@ export class MockDatabase implements DatabaseInterface {
   getReleaseTrackingMetricsLastMonth = vi.fn().mockReturnValue(defaultMetricsMap);
   totalReleasesCount = vi.fn().mockReturnValue(15);
   totalRuntimesCount = vi.fn().mockReturnValue(5);
-  listRuntimes = vi.fn().mockReturnValue(defaultRuntimesPaginationResult);
+  listRuntimes = vi.fn().mockReturnValue(defaultRuntimesPaginationResult());
 
   reset() {
     this.createRelease.mockClear();
