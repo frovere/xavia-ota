@@ -22,18 +22,18 @@ export default async function trackingByReleaseHandler(req: NextApiRequest, res:
     return;
   }
 
-  const { release_id } = req.query;
+  const { id } = req.query;
 
-  logger.info(`Fetching tracking data for release ID: ${release_id}`);
+  logger.info(`Fetching tracking data for release ID: ${id}`);
 
-  if (!release_id || typeof release_id !== 'string') {
+  if (!id || typeof id !== 'string') {
     res.status(400).json({ error: 'Release ID is required' });
     return;
   }
 
   try {
     const database = DatabaseFactory.getDatabase();
-    const trackings = await database.getReleaseTrackingMetrics(release_id);
+    const trackings = await database.getReleaseTrackingMetrics(id);
 
     res.status(200).json(trackings);
   } catch (error) {

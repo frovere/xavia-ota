@@ -23,6 +23,7 @@ export interface DatabaseInterface {
   getRelease(id: string): Promise<typeof releases.$inferSelect | null>;
   getReleaseByPath(path: string): Promise<typeof releases.$inferSelect | null>;
   listReleases(): Promise<(typeof releases.$inferSelect)[]>;
+  listReleasesByRuntimeVersion(version: string): Promise<(typeof releases.$inferSelect)[]>;
   createTracking(
     tracking: typeof releasesTracking.$inferInsert,
   ): Promise<typeof releasesTracking.$inferSelect>;

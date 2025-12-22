@@ -75,6 +75,7 @@ export class MockDatabase implements DatabaseInterface {
   getRelease = vi.fn().mockReturnValue(defaultRelease);
   getReleaseByPath = vi.fn().mockReturnValue(defaultRelease);
   listReleases = vi.fn().mockReturnValue([defaultRelease]);
+  listReleasesByRuntimeVersion = vi.fn().mockReturnValue([defaultRelease]);
   createTracking = vi.fn().mockReturnValue(defaultTracking);
   getReleaseTrackingMetrics = vi.fn().mockReturnValue(defaultTrackingMetrics);
   getReleaseTrackingMetricsForAllReleases = vi.fn().mockReturnValue(defaultTrackingMetrics);

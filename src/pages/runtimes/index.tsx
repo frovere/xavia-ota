@@ -4,7 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { formatDistance } from 'date-fns';
 import { LucideBox, LucideHelpCircle } from 'lucide-react';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { PropsWithChildren, Suspense, useState } from 'react';
 
 import { RuntimeData } from '@/api-utils/database/database-interface';
 import Layout from '@/components/layout';
@@ -69,9 +69,9 @@ const barVariants = cva(
   },
 );
 
-const heights = Array.from({ length: 7 }, () => Math.floor(Math.random() * 70) + 30);
-
 function DecorativeBars({ size }: VariantProps<typeof decorativeBarsVariants>) {
+  const [heights] = useState(Array.from({ length: 7 }, () => Math.floor(Math.random() * 70) + 30));
+
   return (
     <div className={decorativeBarsVariants({ size })}>
       {heights.map((height, i) => {
@@ -113,11 +113,9 @@ function RuntimeCardLarge({ runtime }: { runtime: RuntimeData }) {
               </TooltipContent>
             </Tooltip>
           </div>
-          <Link
-            href={`/runtimes/${runtime.runtimeVersion}/releases`}
-            className="text-muted-foreground hover:text-foreground hover:underline transition-colors">
+          <p className="text-muted-foreground">
             Total releases: {runtime.totalReleases.toLocaleString()}
-          </Link>
+          </p>
         </div>
       </CardContent>
       <div className="absolute bottom-0 right-0 opacity-40">
@@ -152,11 +150,9 @@ function RuntimeCardMedium({ runtime }: { runtime?: RuntimeData }) {
               </TooltipContent>
             </Tooltip>
           </div>
-          <Link
-            href={`/runtimes/${runtime.runtimeVersion}/releases`}
-            className="hover:text-foreground hover:underline transition-colors inline-block">
+          <p className="text-muted-foreground">
             Total releases: {runtime.totalReleases.toLocaleString()}
-          </Link>
+          </p>
         </div>
       </CardContent>
       <div className="absolute bottom-0 right-0 opacity-40">
@@ -184,17 +180,27 @@ function RuntimeCardSmall({ runtime }: { runtime: RuntimeData }) {
               </TooltipContent>
             </Tooltip>
           </p>
-          <Link
-            href={`/runtimes/${runtime.runtimeVersion}/releases`}
-            className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors inline-block">
+          <p className="text-xs text-muted-foreground">
             Total releases: {runtime.totalReleases.toLocaleString()}
-          </Link>
+          </p>
         </div>
       </CardContent>
       <div className="absolute bottom-0 right-0 opacity-20">
         <DecorativeBars size="small" />
       </div>
     </Card>
+  );
+}
+
+function LinkCard({ runtime, children }: PropsWithChildren<{ runtime?: RuntimeData }>) {
+  if (!runtime) {
+    return null;
+  }
+
+  return (
+    <div className="transform hover:scale-[1.015] transition-transform hover:shadow-sm hover:shadow-primary/50">
+      <Link href={`/runtimes/${runtime.runtimeVersion}/releases`}>{children}</Link>
+    </div>
   );
 }
 
@@ -216,13 +222,19 @@ function RuntimesCards({
       <div className="space-y-6">
         <div className="grid grid-cols-5 gap-4">
           <div className="col-span-3">
-            <RuntimeCardLarge runtime={mainRuntime} />
+            <LinkCard runtime={mainRuntime}>
+              <RuntimeCardLarge runtime={mainRuntime} />
+            </LinkCard>
           </div>
           <div className="col-span-2">
             {secondRuntime ? (
               <div className="flex flex-col gap-4">
-                <RuntimeCardMedium runtime={secondRuntime} />
-                <RuntimeCardMedium runtime={thirdRuntime} />
+                <LinkCard runtime={secondRuntime}>
+                  <RuntimeCardMedium runtime={secondRuntime} />
+                </LinkCard>
+                <LinkCard runtime={thirdRuntime}>
+                  <RuntimeCardMedium runtime={thirdRuntime} />
+                </LinkCard>
               </div>
             ) : (
               <Card className="bg-card/50 border-border/60 h-112 w-full relative">
@@ -249,7 +261,9 @@ function RuntimesCards({
 
         <div className="grid grid-cols-5 gap-4">
           {gridRuntimes.map((runtime) => (
-            <RuntimeCardSmall key={runtime.runtimeVersion} runtime={runtime} />
+            <LinkCard key={runtime.runtimeVersion} runtime={runtime}>
+              <RuntimeCardSmall runtime={runtime} />
+            </LinkCard>
           ))}
         </div>
 
@@ -331,18 +345,23 @@ export default function RuntimesPage() {
     <ProtectedRoute>
       <Layout>
         <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold">Runtimes</h1>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground transition-colors">
-                  <LucideHelpCircle className="h-5 w-5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Runtime versions deployed to your applications</p>
-              </TooltipContent>
-            </Tooltip>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold">Runtimes</h1>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="text-muted-foreground hover:text-foreground transition-colors">
+                    <LucideHelpCircle className="h-5 w-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Runtime versions deployed to your applications</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage the runtime versions that your applications use for updates.
+            </p>
           </div>
 
           <Suspense fallback={<RuntimesSkeleton />}>

@@ -56,6 +56,31 @@ export const releasesQueryOpts = queryOptions({
   staleTime: 1000 * 60 * 5,
 });
 
+async function fetchReleasesByVersion({ id }: { id: string }) {
+  const token = localStorage.getItem('bearer-token');
+  if (!token) {
+    throw new Error('Unauthenticated');
+  }
+
+  const response = await fetch(`${baseUrl}/api/releases/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch releases');
+  }
+  const data = await response.json();
+  return data.releases as Release[];
+}
+
+export const releasesQueryByVersionOpts = ({ id }: { id: string }) =>
+  queryOptions({
+    queryKey: ['releases', { version: id }],
+    queryFn: async () => await fetchReleasesByVersion({ id }),
+    staleTime: 1000 * 60 * 5,
+  });
+
 async function fetchRuntimes({ pageParam }: { pageParam: string }) {
   const token = localStorage.getItem('bearer-token');
   if (!token) {

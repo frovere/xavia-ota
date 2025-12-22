@@ -121,6 +121,15 @@ export class PostgresDatabase implements DatabaseInterface {
     return result;
   }
 
+  async listReleasesByRuntimeVersion(version: string): Promise<(typeof releases.$inferSelect)[]> {
+    const result = await db
+      .select()
+      .from(releases)
+      .where(eq(releases.runtimeVersion, version))
+      .orderBy(desc(releases.timestamp));
+    return result;
+  }
+
   async totalReleasesCount(): Promise<number> {
     const result = await db.select({ count: count() }).from(releases);
     return result[0].count;

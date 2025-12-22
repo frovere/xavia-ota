@@ -275,6 +275,28 @@ export class SupabaseDatabase implements DatabaseInterface {
     }));
   }
 
+  async listReleasesByRuntimeVersion(version: string): Promise<(typeof releases.$inferSelect)[]> {
+    const { data, error } = await this.supabase
+      .from(Tables.RELEASES)
+      .select()
+      .eq('runtime_version', version)
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+    return data.map((release) => ({
+      id: release.id,
+      path: release.path,
+      runtimeVersion: release.runtime_version,
+      timestamp: release.timestamp,
+      size: release.size,
+      commitHash: release.commit_hash,
+      commitMessage: release.commit_message,
+      updateId: release.update_id,
+    }));
+  }
+
   async totalReleasesCount(): Promise<number> {
     const { count, error } = await this.supabase
       .from(Tables.RELEASES)
