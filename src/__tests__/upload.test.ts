@@ -1,9 +1,10 @@
 import AdmZip from 'adm-zip';
 import formidable from 'formidable';
 import fs from 'fs';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { upload } from 'node_modules/@google-cloud/storage/build/esm/src/resumable-upload';
 import { createMocks } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
-
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { HashHelper } from '@/api-utils/helpers/hash-helper';
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
@@ -31,10 +32,10 @@ describe('Upload API', () => {
   });
 
   it('should return 405 for non-POST requests', async () => {
-    const { req, res } = createMocks({ method: 'GET' });
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'GET' });
     await uploadHandler(req, res);
     expect(res._getStatusCode()).toBe(405);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
   });
 
   it('should handle file upload successfully', async () => {
@@ -74,7 +75,7 @@ describe('Upload API', () => {
     vi.mocked(DatabaseFactory.getDatabase).mockReturnValue(mockDatabase);
 
     // Execute test
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
       headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` },
     });
@@ -82,7 +83,7 @@ describe('Upload API', () => {
 
     // Verify results
     expect(res._getStatusCode()).toBe(200);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
 
     // Verify all mocks were called correctly
     expect(mockStorage.uploadFile).toHaveBeenCalled();
@@ -102,21 +103,63 @@ describe('Upload API', () => {
   it('should return 400 for missing required fields', async () => {
     const parse = vi.fn().mockResolvedValue([{}, {}]);
     vi.mocked(formidable).mockReturnValue({ parse } as any);
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
       headers: { authorization: `Bearer ${process.env.UPLOAD_KEY}` },
     });
     await uploadHandler(req, res);
 
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
   });
 
   it('should return 401 for missing bearer token', async () => {
-    const { req, res } = createMocks({ method: 'POST' });
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      method: 'POST',
+      headers: { authorization: `Bearer wrong_token` },
+    });
     await uploadHandler(req, res);
 
     expect(res._getStatusCode()).toBe(401);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
+  });
+
+  it('should return 401 for wrong bearer token', async () => {
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'POST' });
+    await uploadHandler(req, res);
+
+    expect(res._getStatusCode()).toBe(401);
+    expect(res._getJSONData()).toMatchSnapshot();
+  });
+
+  it('should allow use of uploadKey in form data when bearer token is missing', async () => {
+    const parse = vi.fn().mockResolvedValue([
+      {
+        uploadKey: [process.env.UPLOAD_KEY],
+      },
+      {},
+    ]);
+    vi.mocked(formidable).mockReturnValue({ parse } as any);
+
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'POST' });
+    await uploadHandler(req, res);
+
+    expect(res._getStatusCode()).not.toBe(401);
+  });
+
+  it('should return 401 for wrong uploadKey in form data when bearer token is missing', async () => {
+    const parse = vi.fn().mockResolvedValue([
+      {
+        uploadKey: ['wrong_key'],
+      },
+      {},
+    ]);
+    vi.mocked(formidable).mockReturnValue({ parse } as any);
+
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'POST' });
+    await uploadHandler(req, res);
+
+    expect(res._getStatusCode()).toBe(401);
+    expect(res._getJSONData()).toMatchSnapshot();
   });
 });

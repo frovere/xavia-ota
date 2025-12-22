@@ -25,7 +25,8 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
     return;
   }
 
-  if (req.headers.authorization !== `Bearer ${process.env.UPLOAD_KEY}`) {
+  const bearerHeader = req.headers.authorization;
+  if (bearerHeader && bearerHeader !== `Bearer ${process.env.UPLOAD_KEY}`) {
     res.status(401).json({ error: 'Unauthorized: wrong upload key' });
     return;
   }
@@ -34,6 +35,13 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
 
   try {
     const [fields, files] = await form.parse(req);
+    const uploadKey = fields.uploadKey?.[0] || null;
+
+    if (!bearerHeader && uploadKey !== process.env.UPLOAD_KEY) {
+      res.status(401).json({ error: 'Unauthorized: wrong upload key' });
+      return;
+    }
+
     const file = files.file?.[0];
     const runtimeVersion = fields.runtimeVersion?.[0];
     const commitHash = fields.commitHash?.[0];
@@ -45,7 +53,8 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
     }
 
     const storage = StorageFactory.getStorage();
-    const timestamp = format(new UTCDate(), 'yyyyMMddHHmmss');
+    const now = new UTCDate();
+    const timestamp = format(now, 'yyyyMMddHHmmss');
     const updatePath = `updates/${runtimeVersion}`;
 
     // Store the zipped file as is
@@ -61,7 +70,7 @@ export default async function uploadHandler(req: NextApiRequest, res: NextApiRes
     await DatabaseFactory.getDatabase().createRelease({
       path,
       runtimeVersion,
-      timestamp: new UTCDate().toISOString(),
+      timestamp: now.toISOString(),
       commitHash,
       commitMessage,
       updateId,

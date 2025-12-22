@@ -19,6 +19,18 @@ exports[`Upload API > should return 401 for missing bearer token 1`] = `
 }
 `;
 
+exports[`Upload API > should return 401 for wrong bearer token 1`] = `
+{
+  "error": "Unauthorized: wrong upload key",
+}
+`;
+
+exports[`Upload API > should return 401 for wrong uploadKey in form data when bearer token is missing 1`] = `
+{
+  "error": "Unauthorized: wrong upload key",
+}
+`;
+
 exports[`Upload API > should return 405 for non-POST requests 1`] = `
 {
   "error": "Method not allowed",
