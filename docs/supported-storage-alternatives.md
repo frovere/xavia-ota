@@ -1,4 +1,4 @@
-# Storage & Database Configuration
+# Storage Configuration
 
 ## Supported Storage Providers
 Xavia OTA supports multiple storage backends for storing update assets. Configure using `BLOB_STORAGE_TYPE`.
@@ -42,28 +42,3 @@ S3_ROOT_DIRECTORY=your-s3-root-directory (optional)
 - Support all S3 compatible storage (AWS S3, Digital Ocean Spaces, Cloudflare R2, etc.)
 - Bucket should be created manually before starting the server
 - If you set `S3_ROOT_DIRECTORY`, it will prefix all storage keys inside the bucket. Do not include spaces in the root; the server will remove whitespace from this value.
-
-## Supported Database Providers
-Database configuration is managed via `DB_TYPE`.
-
-### Supabase Database
-```env
-DB_TYPE=supabase
-SUPABASE_URL=your-project-url
-SUPABASE_API_KEY=your-service-role-key
-```
-- Uses Supabase's PostgreSQL database
-- Tables should be created manually before starting the server. Refer to the `containers/database/schema` folder for reference.
-
-### PostgreSQL
-```env
-DB_TYPE=postgres
-POSTGRES_USER=your-user
-POSTGRES_PASSWORD=your-password
-POSTGRES_DB=your-database-name
-POSTGRES_HOST=your-host
-POSTGRES_PORT=your-port
-```
-- Direct PostgreSQL connection
-- Supports any PostgreSQL-compatible database
-- Tables should be created manually before starting the server. Refer to the `containers/database/schema` folder for reference.
