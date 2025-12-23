@@ -8,6 +8,7 @@
     "build": "bun --bun next build --turbopack",
     "start": "bun --bun next start",
     "lint": "eslint src",
+    "lint:ts": "tsc --noEmit",
     "lint:biome": "biome check src",
     "test": "vitest run",
     "test:watch": "vitest watch",
