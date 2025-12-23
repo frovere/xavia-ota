@@ -2,7 +2,6 @@ import AdmZip from 'adm-zip';
 import formidable from 'formidable';
 import fs from 'fs';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { upload } from 'node_modules/@google-cloud/storage/build/esm/src/resumable-upload';
 import { createMocks } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
