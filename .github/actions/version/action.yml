@@ -1,0 +1,10 @@
+name: "Extract version"
+description: "Extracts the version number from the Git tag by removing the 'v' prefix and sets it as an environment variable."
+runs:
+  using: composite
+  steps:
+  - run: |
+      VERSION=${GITHUB_REF_NAME#v}
+      echo "Stripped version: $VERSION"
+      echo "VERSION=$VERSION" >> $GITHUB_ENV
+    shell: bash
