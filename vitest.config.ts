@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
             include: ['src/__tests__/auth/*.test.ts'],
           },
         },
-      ]
+      ],
     },
   };
 });

@@ -11,7 +11,6 @@ let pgUrl = {
   default: process.env.DATABASE_URL!,
 }[process.env.DB_TYPE || 'default']!;
 
-
 if (pgUrl.includes('postgres:postgres@supabase_db_')) {
   const url = URL.parse(pgUrl)!;
 
