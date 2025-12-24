@@ -169,7 +169,8 @@ For more information about the admin dashboard, please refer to the [Admin Dashb
 ## Technical Stack
 
 ### Core Technologies
-- **Runtime** Bun 1.3.x
+- **Runtime** Node v24.x or Bun 1.3.x
+- **Package Manager** Bun
 - **Framework**: Next.js 16+
 - **Language**: TypeScript
 - **Auth**: Better Auth
