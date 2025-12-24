@@ -1,14 +1,17 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { mockGetSession } from '@/__tests__/mocks/mock-auth';
+import { MockDatabase } from '@/__tests__/mocks/mock-database';
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { auth } from '@/lib/auth';
 import runtimesHandler from '@/pages/api/runtimes';
-import { MockDatabase } from './mocks/mock-database';
-import { getTestBearerToken } from './test-utils/test-user';
 
-vi.mock(import('../api-utils/database/database-factory'));
-vi.mock(import('../api-utils/storage/storage-factory'));
+vi.mock(import('../../api-utils/database/database-factory'));
+vi.mock(import('../../api-utils/storage/storage-factory'));
+vi.mock(import('../../lib/auth'));
+vi.mocked(auth.api.getSession).mockImplementation(mockGetSession);
 
 describe('Runtimes API', () => {
   beforeEach(() => {
@@ -24,23 +27,12 @@ describe('Runtimes API', () => {
     expect(res._getJSONData()).toMatchSnapshot();
   });
 
-  it('should return 401 for missing bearer token', async () => {
-    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'GET' });
-    await runtimesHandler(req, res);
-
-    expect(res._getStatusCode()).toBe(401);
-    expect(res._getJSONData()).toMatchSnapshot();
-  });
-
   it('should return releases successfully', async () => {
     const mockDatabase = new MockDatabase();
     vi.mocked(DatabaseFactory.getDatabase).mockReturnValue(mockDatabase);
 
-    const bearerToken = await getTestBearerToken();
-
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: { Authorization: `Bearer ${bearerToken}` },
     });
     await runtimesHandler(req, res);
 
@@ -54,11 +46,8 @@ describe('Runtimes API', () => {
 
     vi.mocked(DatabaseFactory.getDatabase).mockReturnValue(mockDatabase);
 
-    const bearerToken = await getTestBearerToken();
-
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: { Authorization: `Bearer ${bearerToken}` },
     });
     await runtimesHandler(req, res);
 

@@ -1,5 +1,6 @@
 import AdmZip from 'adm-zip';
 import FormData from 'form-data';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -12,11 +13,11 @@ import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { releases } from '@/db/schema';
 import manifestEndpoint from '@/pages/api/manifest';
 
-vi.mock(import('../api-utils/helpers/update-helper'));
-vi.mock(import('../api-utils/helpers/zip-helper'));
-vi.mock(import('../api-utils/helpers/config-helper'));
-vi.mock(import('../api-utils/helpers/hash-helper'));
-vi.mock(import('../api-utils/database/database-factory'));
+vi.mock(import('../../api-utils/helpers/update-helper'));
+vi.mock(import('../../api-utils/helpers/zip-helper'));
+vi.mock(import('../../api-utils/helpers/config-helper'));
+vi.mock(import('../../api-utils/helpers/hash-helper'));
+vi.mock(import('../../api-utils/database/database-factory'));
 vi.mock('form-data', () => {
   const MockedFormData = vi.fn();
   MockedFormData.prototype.append = vi.fn();
@@ -33,14 +34,14 @@ describe('Manifest API', () => {
   });
 
   it('should return 405 for non-GET requests', async () => {
-    const { req, res } = createMocks({ method: 'POST' });
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: 'POST' });
     await manifestEndpoint(req, res);
     expect(res._getStatusCode()).toBe(405);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
   });
 
   it('should return 400 for invalid platform', async () => {
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'web',
@@ -49,11 +50,11 @@ describe('Manifest API', () => {
     });
     await manifestEndpoint(req, res);
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
   });
 
   it('should return 400 for missing runtime version', async () => {
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'ios',
@@ -61,7 +62,7 @@ describe('Manifest API', () => {
     });
     await manifestEndpoint(req, res);
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toMatchSnapshot();
+    expect(res._getJSONData()).toMatchSnapshot();
   });
 
   it('should return NoUpdateAvailable when user is already running the latest release', async () => {
@@ -88,7 +89,7 @@ describe('Manifest API', () => {
       mockNoUpdateDirective,
     );
 
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'ios',
@@ -169,7 +170,7 @@ describe('Manifest API', () => {
     };
     (ZipHelper.getZipFromStorage as Mock).mockResolvedValue(mockZip as unknown as AdmZip);
 
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'ios',
@@ -216,7 +217,7 @@ describe('Manifest API', () => {
     };
     (ZipHelper.getZipFromStorage as Mock).mockResolvedValue(mockZip as unknown as AdmZip);
 
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'ios',
@@ -274,7 +275,7 @@ describe('Manifest API', () => {
     };
     (ZipHelper.getZipFromStorage as Mock).mockResolvedValue(mockZip as unknown as AdmZip);
 
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'ios',
@@ -309,7 +310,7 @@ describe('Manifest API', () => {
       mockNoUpdateDirective,
     );
 
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       headers: {
         'expo-platform': 'ios',

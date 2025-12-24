@@ -6,12 +6,6 @@ exports[`Releases API > should handle errors gracefully 1`] = `
 }
 `;
 
-exports[`Releases API > should return 401 for missing bearer token 1`] = `
-{
-  "error": "Unauthorized",
-}
-`;
-
 exports[`Releases API > should return 405 for non-GET requests 1`] = `
 {
   "error": "Method not allowed",

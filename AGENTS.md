@@ -32,10 +32,15 @@ The project uses a `src/` directory as the top-level folder for the Next.js appl
 ```
 xavia-ota/
 ├── src/
-│   ├── __tests__/           # Vitest test files
+│   ├── __tests__/           # Vitest test files (organized by project)
+│   │   ├── core/            # Core API tests (manifest, assets, upload)
+│   │   │   └── __snapshots__/
+│   │   ├── dashboard/       # Dashboard/admin tests (releases, runtimes, rollback)
+│   │   │   └── __snapshots__/
+│   │   ├── auth/            # Authentication tests
+│   │   │   └── __snapshots__/
 │   │   ├── mocks/           # Mock implementations (MockDatabase, MockStorage)
-│   │   ├── test-utils/      # Test utilities
-│   │   └── __snapshots__/   # Test snapshots
+│   │   └── test-utils/      # Test utilities
 │   ├── api-utils/           # Backend utilities
 │   │   ├── database/        # Database adapters (Factory pattern)
 │   │   ├── helpers/         # Utility functions
@@ -188,14 +193,57 @@ See `.env.example.local` for full configuration options.
 
 ## Testing Guidelines
 
-- Tests are located in `src/__tests__/` directory
-- Test files follow the pattern `*.test.ts`
-- Snapshots are in `src/__tests__/__snapshots__/`
-- Mock implementations in `src/__tests__/mocks/`:
+Tests are organized into Vitest projects in the `src/__tests__/` directory:
+
+### Test Organization
+
+- **core/** - Core API functionality tests
+  - `assets.test.ts` - Asset serving and download
+  - `manifest.test.ts` - Update manifest generation
+  - `upload.test.ts` - Release upload handling
+  
+- **dashboard/** - Admin portal and management tests
+  - `releases.test.ts` - Release listing and details
+  - `releases-update.test.ts` - Release updates
+  - `runtimes.test.ts` - Runtime version management
+  - `rollback.test.ts` - Version rollback functionality
+  
+- **auth/** - Authentication tests
+  - `auth.test.ts` - Better Auth integration
+
+- **mocks/** - Mock implementations
   - `mock-database.ts` - `MockDatabase` class implementing `DatabaseInterface`
   - `mock-storage.ts` - `MockStorage` class implementing `StorageInterface`
-- Run `bun test` to execute all tests
-- Tests use `vitest.setup.ts` for global setup (PGLite database)
+
+- **test-utils/** - Shared test utilities and helpers
+
+### Running Tests
+
+```bash
+# Run all tests
+bun test
+
+# Run specific project
+bun test --project=core
+bun test --project=dashboard
+bun test --project=auth
+
+# Run specific test file
+bun test src/__tests__/core/assets.test.ts
+
+# Watch mode
+bun test --watch
+```
+
+### Vitest Projects Configuration
+
+Tests are configured in `vitest.config.ts` with three projects:
+
+1. **core** - Core API endpoints (`src/__tests__/core/*.test.ts`)
+2. **dashboard** - Admin features (`src/__tests__/dashboard/*.test.ts`)
+3. **auth** - Authentication (`src/__tests__/auth/*.test.ts`)
+
+Each project has its own snapshots directory and can be run independently.
 
 ```typescript
 // Using mock classes in tests

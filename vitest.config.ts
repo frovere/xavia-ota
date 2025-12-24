@@ -9,8 +9,29 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'node',
       env: loadEnv(mode, process.cwd(), ''),
-      // globalSetup: './vitest.setup.ts',
-      setupFiles: './vitest.setup.ts',
+      projects: [
+        {
+          extends: true,
+          test: {
+            name: 'core',
+            include: ['src/__tests__/core/*.test.ts'],
+          },
+        },
+        {
+          extends: true,
+          test: {
+            name: 'dashboard',
+            include: ['src/__tests__/dashboard/*.test.ts'],
+          },
+        },
+        {
+          extends: true,
+          test: {
+            name: 'auth',
+            include: ['src/__tests__/auth/*.test.ts'],
+          },
+        },
+      ]
     },
   };
 });

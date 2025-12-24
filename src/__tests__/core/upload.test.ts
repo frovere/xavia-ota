@@ -4,18 +4,19 @@ import fs from 'fs';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
+import { MockDatabase } from '@/__tests__/mocks/mock-database';
+import { MockStorage } from '@/__tests__/mocks/mock-storage';
 import { DatabaseFactory } from '@/api-utils/database/database-factory';
 import { HashHelper } from '@/api-utils/helpers/hash-helper';
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import { StorageFactory } from '@/api-utils/storage/storage-factory';
 import uploadHandler from '@/pages/api/upload';
-import { MockDatabase } from './mocks/mock-database';
-import { MockStorage } from './mocks/mock-storage';
 
-vi.mock(import('../api-utils/database/database-factory'));
-vi.mock(import('../api-utils/storage/storage-factory'));
-vi.mock(import('../api-utils/helpers/zip-helper'));
-vi.mock(import('../api-utils/helpers/hash-helper'));
+vi.mock(import('../../api-utils/database/database-factory'));
+vi.mock(import('../../api-utils/storage/storage-factory'));
+vi.mock(import('../../api-utils/helpers/zip-helper'));
+vi.mock(import('../../api-utils/helpers/hash-helper'));
 vi.mock('formidable', () => {
   return {
     default: vi.fn().mockReturnValue({

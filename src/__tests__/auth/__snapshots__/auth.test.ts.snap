@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Auth related tests > should return 401 for missing bearer token for releases request 1`] = `
+{
+  "error": "Unauthorized",
+}
+`;
+
+exports[`Auth related tests > should return 401 for missing bearer token for releases updates request 1`] = `
+{
+  "error": "Unauthorized",
+}
+`;
+
+exports[`Auth related tests > should return 401 for missing bearer token for rollback request 1`] = `
+{
+  "error": "Unauthorized",
+}
+`;
+
+exports[`Auth related tests > should return 401 for missing bearer token for runtimes request 1`] = `
+{
+  "error": "Unauthorized",
+}
+`;

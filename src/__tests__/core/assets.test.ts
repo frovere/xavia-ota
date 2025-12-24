@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { createMocks } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -5,8 +6,8 @@ import { UpdateHelper } from '@/api-utils/helpers/update-helper';
 import { ZipHelper } from '@/api-utils/helpers/zip-helper';
 import assetsEndpoint from '@/pages/api/assets';
 
-vi.mock('../api-utils/helpers/update-helper');
-vi.mock('../api-utils/helpers/zip-helper');
+vi.mock('../../api-utils/helpers/update-helper');
+vi.mock('../../api-utils/helpers/zip-helper');
 
 describe('Assets API', () => {
   beforeEach(() => {
@@ -14,7 +15,7 @@ describe('Assets API', () => {
   });
 
   it('should return 400 if asset path is missing', async () => {
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       query: {
         platform: 'ios',
@@ -27,7 +28,7 @@ describe('Assets API', () => {
   });
 
   it('should return 400 if platform is invalid', async () => {
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       query: {
         asset: 'test.png',
@@ -59,7 +60,7 @@ describe('Assets API', () => {
     (ZipHelper.getZipFromStorage as Mock).mockResolvedValue({});
     (ZipHelper.getFileFromZip as Mock).mockResolvedValue(Buffer.from('test'));
 
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       query: {
         asset: 'test.png',
