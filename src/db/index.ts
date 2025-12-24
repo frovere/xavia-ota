@@ -4,13 +4,15 @@ type DBModule =
   | typeof import('./index.pg-vercel').db
   | typeof import('./index.pg-bun').db;
 
-export let db: DBModule;
+let dbModule: DBModule;
 
 if (process.env.NODE_ENV === 'test' || process.env.DB_TYPE === 'pglite') {
-  db = await import('./index.pglite').then((mod) => mod.db);
+  dbModule = await import('./index.pglite').then((mod) => mod.db);
 } else {
-  db = await factory();
+  dbModule = await factory();
 }
+
+export const db = dbModule;
 
 async function factory() {
   switch (process.env.DB_TYPE) {
