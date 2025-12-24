@@ -13,7 +13,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -37,11 +37,39 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:alpine
             ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:${{ env.VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:${{ env.VERSION }}-alpine
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache,mode=max
+
+      - name: Build and push Docker image slim
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          file: Dockerfile.slim
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:slim
+            ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:${{ env.VERSION }}-slim
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache,mode=max
+
+      - name: Build and push Docker image bun
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          file: Dockerfile.bun
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:bun
+            ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:${{ env.VERSION }}-bun
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache,mode=max
 

@@ -25,7 +25,7 @@ jobs:
         run: bun install
         working-directory: ./
       - name: tsc
-        run: bun run tsc
+        run: bun run lint:ts
         working-directory: ./
       - name: Run Biome
         run: biome ci .
