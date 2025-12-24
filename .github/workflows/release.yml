@@ -1,9 +1,17 @@
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.1)'
+        required: true
   push:
     tags:
       - 'v*'
+
+env:
+  VERSION: ${{ github.event.inputs.version || github.ref_name }}
 
 # Add permissions block
 permissions:
@@ -16,10 +24,6 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - name: Get version from package.json
-        id: get_version
-        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -72,25 +76,3 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:${{ env.VERSION }}-bun
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/xavia-ota:buildcache,mode=max
-
-      - name: Get Changelog Entry
-        id: changelog
-        run: |
-          version="${GITHUB_REF#refs/tags/v}"
-          changelog=$(awk "/## \[$version\]/{flag=1;next}/## \[/{flag=0}flag" CHANGELOG.md)
-          changelog="${changelog//'%'/'%25'}"
-          changelog="${changelog//$'\n'/'%0A'}"
-          changelog="${changelog//$'\r'/'%0D'}"
-          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$changelog" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release ${{ env.VERSION }}
-          body: ${{ env.CHANGELOG }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Explicitly specify the token
