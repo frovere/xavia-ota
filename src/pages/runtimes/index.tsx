@@ -4,7 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { formatDistance } from 'date-fns';
 import { LucideBox, LucideHelpCircle } from 'lucide-react';
 import Link from 'next/link';
-import { PropsWithChildren, Suspense, useState } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 
 import { RuntimeData } from '@/api-utils/database/database-interface';
 import Layout from '@/components/layout';
@@ -69,8 +69,10 @@ const barVariants = cva(
   },
 );
 
+const getBarsHeights = () => Array.from({ length: 7 }, () => Math.floor(Math.random() * 70) + 30);
+
 function DecorativeBars({ size }: VariantProps<typeof decorativeBarsVariants>) {
-  const [heights] = useState(Array.from({ length: 7 }, () => Math.floor(Math.random() * 70) + 30));
+  const heights = getBarsHeights();
 
   return (
     <div className={decorativeBarsVariants({ size })}>
