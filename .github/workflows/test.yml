@@ -10,20 +10,28 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v5
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 18.x
-      - name: npm
-        run: npm install
+          bun-version: 1.3
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: bun
+        run: bun install
         working-directory: ./
       - name: tsc
-        run: npx tsc
+        run: bun run lint:ts
         working-directory: ./
+      - name: Run Biome
+        run: biome ci .
       - name: Lint
-        run: npm run lint
+        run: bun run lint
         working-directory: ./
       - name: Test
-        run: npm run test
+        run: bun run test
         working-directory: ./

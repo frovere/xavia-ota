@@ -1,0 +1,140 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.9/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto",
+    "bracketSameLine": false,
+    "bracketSpacing": true,
+    "expand": "auto",
+    "useEditorconfig": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false,
+      "complexity": {
+        "noArguments": "warn",
+        "noCommaOperator": "warn",
+        "noExtraBooleanCast": "warn",
+        "noUselessConstructor": "warn",
+        "noUselessEscapeInRegex": "warn",
+        "noUselessLoneBlockStatements": "warn",
+        "noUselessRename": "warn",
+        "noUselessStringConcat": "warn",
+        "noUselessTernary": "warn",
+        "noVoid": "warn",
+        "useLiteralKeys": "warn"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noConstantCondition": "warn",
+        "noEmptyCharacterClassInRegex": "warn",
+        "noEmptyPattern": "warn",
+        "noGlobalObjectCalls": "warn",
+        "noInnerDeclarations": "warn",
+        "noInvalidBuiltinInstantiation": "error",
+        "noInvalidConstructorSuper": "warn",
+        "noSelfAssign": "warn",
+        "noSwitchDeclarations": "warn",
+        "noUndeclaredVariables": "error",
+        "noUnreachable": "warn",
+        "noUnreachableSuper": "warn",
+        "noUnusedLabels": "warn",
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error",
+        "useIsNan": "error",
+        "useParseIntRadix": "warn",
+        "useValidTypeof": "error"
+      },
+      "security": {
+        "noGlobalEval": "warn",
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "style": {
+        "noYodaExpression": "warn",
+        "useArrayLiterals": "warn",
+        "useBlockStatements": "warn",
+        "useConst": "warn",
+        "useFragmentSyntax": "warn"
+      },
+      "suspicious": {
+        "noAlert": "off",
+        "noCatchAssign": "warn",
+        "noCompareNegZero": "warn",
+        "noControlCharactersInRegex": "off",
+        "noDebugger": "warn",
+        "noDoubleEquals": "warn",
+        "noDuplicateCase": "error",
+        "noDuplicateClassMembers": "error",
+        "noDuplicateJsxProps": "error",
+        "noDuplicateObjectKeys": "error",
+        "noDuplicateParameters": "error",
+        "noFallthroughSwitchClause": "warn",
+        "noFunctionAssign": "error",
+        "noGlobalAssign": "warn",
+        "noArrayIndexKey": "warn",
+        "noIrregularWhitespace": "warn",
+        "noLabelVar": "warn",
+        "noOctalEscape": "warn",
+        "noRedeclare": "warn",
+        "noSelfCompare": "warn",
+        "noShadowRestrictedNames": "warn",
+        "noSparseArray": "warn",
+        "noUnsafeNegation": "warn",
+        "noUnknownAtRules": "off",
+        "noVar": "warn",
+        "noWith": "warn",
+        "useGetterReturn": "warn"
+      }
+    },
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSameLine": true,
+      "quoteStyle": "single",
+      "attributePosition": "auto",
+      "bracketSpacing": true
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["src/__tests__/**/*.ts", "src/__tests__/**/*.tsx"],
+      "javascript": { "globals": [] },
+      "linter": {
+        "rules": {
+          "correctness": { "noUndeclaredVariables": "off" }
+        }
+      }
+    }
+  ],
+  "assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } }
+}

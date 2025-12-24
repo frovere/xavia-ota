@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS releases_tracking (
 -- Index for faster queries on release_id and timestamp
 CREATE INDEX idx_tracking_release_id ON releases_tracking(release_id);
 CREATE INDEX idx_tracking_platform ON releases_tracking(platform);
+CREATE INDEX idx_tracking_download_timestamp ON releases_tracking(download_timestamp);

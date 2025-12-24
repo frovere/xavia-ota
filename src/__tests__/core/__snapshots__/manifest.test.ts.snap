@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Manifest API > should return 400 for invalid platform 1`] = `
+{
+  "error": "Unsupported platform. Expected either ios or android.",
+}
+`;
+
+exports[`Manifest API > should return 400 for missing runtime version 1`] = `
+{
+  "error": "No runtimeVersion provided.",
+}
+`;
+
+exports[`Manifest API > should return 405 for non-GET requests 1`] = `
+{
+  "error": "Expected GET.",
+}
+`;

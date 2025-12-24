@@ -1,0 +1,32 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Runtimes API > should handle errors gracefully 1`] = `
+{
+  "error": "Failed to fetch runtimes",
+}
+`;
+
+exports[`Runtimes API > should return 405 for non-GET requests 1`] = `
+{
+  "error": "Method not allowed",
+}
+`;
+
+exports[`Runtimes API > should return releases successfully 1`] = `
+{
+  "data": [
+    {
+      "lastReleasedAt": "2025-12-22T18:17:18.000Z",
+      "runtimeVersion": "1.0.0",
+      "totalReleases": 5,
+    },
+    {
+      "lastReleasedAt": "2025-12-22T18:17:18.000Z",
+      "runtimeVersion": "1.1.0",
+      "totalReleases": 3,
+    },
+  ],
+  "hasNextCursor": false,
+  "nextCursor": null,
+}
+`;

@@ -1,0 +1,69 @@
+import { UTCDate } from '@date-fns/utc';
+import { fromNodeHeaders } from 'better-auth/node';
+import { format } from 'date-fns';
+import { NextApiRequest, NextApiResponse } from 'next';
+
+import { DatabaseFactory } from '@/api-utils/database/database-factory';
+import { getLogger } from '@/api-utils/logger';
+import { StorageFactory } from '@/api-utils/storage/storage-factory';
+import { auth } from '@/lib/auth';
+
+const logger = getLogger('rollback');
+
+export default async function rollbackHandler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  const { path, runtimeVersion, commitHash, commitMessage } = req.body;
+
+  if (!path) {
+    res.status(400).json({ error: 'Missing path' });
+    return;
+  }
+
+  if (!runtimeVersion) {
+    res.status(400).json({ error: 'Missing runtimeVersion' });
+    return;
+  }
+
+  if (!commitHash) {
+    res.status(400).json({ error: 'Missing commitHash' });
+    return;
+  }
+
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
+
+  if (!session) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const storage = StorageFactory.getStorage();
+
+    const timestamp = format(new UTCDate(), 'yyyyMMddHHmmss');
+    const newPath = `updates/${runtimeVersion}/${timestamp}.zip`;
+
+    await storage.copyFile(path, newPath);
+
+    const oldRelease = await DatabaseFactory.getDatabase().getReleaseByPath(path);
+
+    await DatabaseFactory.getDatabase().createRelease({
+      path: newPath,
+      runtimeVersion,
+      timestamp: new UTCDate().toISOString(),
+      commitHash,
+      commitMessage,
+      updateId: oldRelease?.updateId,
+    });
+
+    res.status(200).json({ success: true, newPath });
+  } catch (error) {
+    logger.error({ error }, 'Rollback error.');
+    res.status(500).json({ error: 'Rollback failed' });
+  }
+}

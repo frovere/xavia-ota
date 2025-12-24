@@ -30,6 +30,7 @@ yarn-error.log*
 .env.test.local
 !.env.prod.example
 .env.prod
+.env
 
 
 .vscode
@@ -39,6 +40,8 @@ yarn-error.log*
 /local-releases
 /scripts/prod
 code-signing-keys
+
+tsconfig.tsbuildinfo
 
 # Husky
 .husky/_

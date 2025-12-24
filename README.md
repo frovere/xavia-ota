@@ -15,6 +15,7 @@ A self-hosted Over-The-Air (OTA) updates server for Expo/RN applications that gi
   - [Overview](#overview)
   - [Key Features](#key-features)
   - [Deployment](#deployment)
+    - [Load test your deployment setup](#load-test-your-deployment-setup)
   - [Local Development](#local-development)
   - [Code Signing](#code-signing)
   - [React Native app configuration](#react-native-app-configuration)
@@ -24,6 +25,7 @@ A self-hosted Over-The-Air (OTA) updates server for Expo/RN applications that gi
   - [Technical Stack](#technical-stack)
     - [Core Technologies](#core-technologies)
     - [Storage Options](#storage-options)
+    - [Database Options](#database-options)
     - [Development Tools](#development-tools)
   - [Community Contributions](#community-contributions)
   - [FAQ](#faq)
@@ -71,7 +73,7 @@ The easiest way to deploy Xavia OTA is using our public Docker image. The image 
     ` docker run -d -p 3000:3000 xaviaio/xavia-ota -e HOST=http://localhost:3000 ...`
 
 ### Load test your deployment setup
-Check [this](./docs/laod_testing.md) on how to run load testing for your OTA server in your deployment infrastructure.
+Check [this](./docs/load-testing.md) on how to run load testing for your OTA server in your deployment infrastructure.
 
 ## Local Development
 
@@ -79,7 +81,7 @@ Check [this](./docs/laod_testing.md) on how to run load testing for your OTA ser
    ```bash
    git clone git@github.com:xavia-io/xavia-ota.git
    cd xavia-ota
-   npm install
+   bun install
    ```
 
 2. Copy the example local env file:
@@ -92,25 +94,26 @@ Check [this](./docs/laod_testing.md) on how to run load testing for your OTA ser
    HOST=http://localhost:3000
    BLOB_STORAGE_TYPE=local
    DB_TYPE=postgres
-   ADMIN_PASSWORD=your-admin-password
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/releases_db
    PRIVATE_KEY_BASE_64=your-base64-encoded-private-key
    UPLOAD_KEY=abc123def456
-   POSTGRES_USER=postgres
-   POSTGRES_PASSWORD=postgres
-   POSTGRES_DB=releases_db
-   POSTGRES_HOST=localhost
-   POSTGRES_PORT=5432
+   BETTER_AUTH_SECRET=secure-secret-key
+   BETTER_AUTH_URL=http://localhost:3000
+   DISABLE_SIGNUP=false
    ```
+  - 3.1. Run `openssl rand -base64 32` to generate keys with high entropy.
 
 4. Start the development server:
    ```bash
-   npm run dev
+   bun run dev
    ```
+
+5. Create an user `http://localhost:3000/sign-up`
 
 The server and admin dashboard will be available at `http://localhost:3000`.
 
 
-Refer to [Storage & Database Configuration](./docs/supportedStorageAlternatives.md) for more configuration options.
+Refer to [Storage & Database Configuration](./docs/supported-storage-alternatives.md) for more configuration options.
 
 
 ## Code Signing 
@@ -161,28 +164,40 @@ What happens behind the scenes is that we copy the inactive update with a new ti
 
 ## Admin Dashboard
 
-For more information about the admin dashboard, please refer to the [Admin Dashboard](./docs/adminPortal.md) documentation.
+For more information about the admin dashboard, please refer to the [Admin Dashboard](./docs/admin-portal.md) documentation.
 
 ## Technical Stack
 
 ### Core Technologies
-- **Framework**: Next.js 15+
+- **Runtime** Node v24.x or Bun 1.3.x
+- **Package Manager** Bun
+- **Framework**: Next.js 16+
 - **Language**: TypeScript
-- **Database**: PostgreSQL 14
-- **UI Library**: Chakra UI (v2) and Tailwind CSS for styling
+- **Auth**: Better Auth
+- **Database**: PostgreSQL 14+
+- **DB Queries**: Drizzle ORM / Supabase API
+- **UI Library**: shadcn/ui and Tailwind CSS for styling
 - **Container**: Docker & Docker Compose
 
 ### Storage Options
 - Local filesystem storage for development
 - Supabase storage for production deployments
   
-Read more about supported blob storage and database options [here](./docs/supportedStorageAlternatives.md).
+Read more about supported blob storage options [here](./docs/supported-storage-alternatives.md).
 
+
+### Database Options
+- Local Postgres for development
+- Self host postgres, supabase, vercel postgres for production deployments
+- PGLite for Testing/CI environment
+
+Read more about supported database options [here](./docs/supported-db-alternatives.md).
 
 
 ### Development Tools
-- ESLint for code quality
-- Jest for testing
+- Bun as runtime
+- Biome & ESLint for code quality
+- Vitest for testing
 - Docker for containerization
 - Make for development scripts
 
