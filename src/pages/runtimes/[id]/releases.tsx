@@ -70,23 +70,23 @@ function TableSkeleton() {
           const key = 'table-skeleton-' + index;
           return (
             <TableRow key={key}>
-              <TableCell>
-                <Skeleton className="w-40 h-8" />
+              <TableCell className="h-8">
+                <Skeleton className="w-40 h-6" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="w-20 h-8" />
+              <TableCell className="h-8">
+                <Skeleton className="w-20 h-6" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="w-30 h-8" />
+              <TableCell className="h-8">
+                <Skeleton className="w-30 h-6" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="w-20 h-8" />
+              <TableCell className="h-8">
+                <Skeleton className="w-20 h-6" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="w-10 h-8" />
+              <TableCell className="h-8">
+                <Skeleton className="w-10 h-6" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="w-40 h-8" />
+              <TableCell className="h-8">
+                <Skeleton className="w-40 h-6" />
               </TableCell>
             </TableRow>
           );

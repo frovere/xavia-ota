@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -88,16 +89,20 @@ export function ReleasesUpdatesData() {
   const { id } = router.query;
   const { data: releases } = useSuspenseQuery(queryOpts({ id: id as string }));
 
-  const { mutate: handleRollback } = useMutation({
+  const { mutateAsync: handleRollbackMutate, isPending } = useMutation({
     mutationFn: (release: Release) => postRollback(release),
-    onSuccess: (_data, _vars, _result, { client }) => {
-      toast.success('Rollback successful');
-      client.invalidateQueries({ queryKey: queryOpts({ id: id as string }).queryKey });
-    },
-    onError: () => {
-      toast.error('Rollback failed');
+    onSuccess: async (_data, _vars, _result, { client }) => {
+      await client.invalidateQueries({ queryKey: queryOpts({ id: id as string }).queryKey });
     },
   });
+
+  function handleRollback(release: Release) {
+    toast.promise(handleRollbackMutate(release), {
+      loading: 'Rolling back release...',
+      success: 'Rollback successful',
+      error: 'Rollback failed',
+    });
+  }
 
   return (
     <TooltipProvider>
@@ -113,6 +118,28 @@ export function ReleasesUpdatesData() {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {isPending && (
+            <TableRow>
+              <TableCell className="h-8">
+                <Skeleton className="w-40 h-5" />
+              </TableCell>
+              <TableCell className="h-8">
+                <Skeleton className="w-20 h-5" />
+              </TableCell>
+              <TableCell className="h-8">
+                <Skeleton className="w-30 h-5" />
+              </TableCell>
+              <TableCell className="h-8">
+                <Skeleton className="w-20 h-5" />
+              </TableCell>
+              <TableCell className="h-8">
+                <Skeleton className="w-10 h-5" />
+              </TableCell>
+              <TableCell className="h-8">
+                <Skeleton className="w-40 h-5" />
+              </TableCell>
+            </TableRow>
+          )}
           {releases
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
             .map((release, index) => (

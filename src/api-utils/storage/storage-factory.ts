@@ -1,6 +1,7 @@
 import { getLogger } from '@/api-utils/logger';
 import { GCSStorage } from './gcs-storage';
 import { LocalStorage } from './local-storage';
+import { S3BunStorage } from './s3-bun-storage';
 import { S3Storage } from './s3-storage';
 import { StorageInterface } from './storage-interface';
 import { SupabaseStorage } from './supabase-storage';
@@ -21,6 +22,8 @@ export class StorageFactory {
         StorageFactory.instance = new GCSStorage();
       } else if (storageType === 's3') {
         StorageFactory.instance = new S3Storage();
+      } else if (storageType === 's3-bun') {
+        StorageFactory.instance = new S3BunStorage();
       } else {
         logger.error(`Unsupported storage type ${storageType}`);
         throw new Error('Unsupported storage type');
